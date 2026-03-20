@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import ingredientsRoutes from './routes/ingredients.js';
+import apiRouter from './routes/api-router.js';
 
 dotenv.config();
 
@@ -10,8 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-app.use('/api/ingredients',ingredientsRoutes)
+app.use('/api',apiRouter)
 
 app.get('/', (req, res) => {
   res.send('StockPot server is running perfectly!');

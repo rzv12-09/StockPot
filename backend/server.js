@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api',apiRouter)
+app.use('/api', apiRouter);
 
 app.get('/', (req, res) => {
   res.send('StockPot server is running perfectly!');

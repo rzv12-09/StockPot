@@ -31,7 +31,7 @@ const Ingredients = () => {
       <h2>Ingredients List</h2>
       <ul>
         {ingredients.map((ingredient) => (
-          <li key={ingredient.id}>{ingredient.nume_ingredient}</li>
+          <li key={ingredient.id}>{ingredient.name}</li>
         ))}
       </ul>
     </div>

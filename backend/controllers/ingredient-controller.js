@@ -12,17 +12,17 @@ const getIngredients = async (req, res) => {
 
 const addIngredient = async (req, res) => {
   try {
-    const { name, unitate_masura, stoc_curent, prag_minim_alerta } = req.body;
+    const { name, unit_of_measure, current_stock, alert_threshold } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Ingredient name is required' });
     }
 
     const result = await db.query(
-      `INSERT INTO Ingredient (nume_ingredient, unitate_masura, stoc_curent, prag_minim_alerta) 
+      `INSERT INTO Ingredient (name, unit_of_measure, current_stock, alert_threshold) 
        VALUES ($1, $2, $3, $4) 
        RETURNING *`,
-      [name, unitate_masura, stoc_curent, prag_minim_alerta]
+      [name, unit_of_measure, current_stock, alert_threshold]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
@@ -31,4 +31,20 @@ const addIngredient = async (req, res) => {
   }
 };
 
-export { getIngredients, addIngredient };
+const deleteIngredient = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(`DELETE FROM Ingredient WHERE ID = $1 RETURNING *`, [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Ingredient not found' });
+    }
+    res
+      .status(200)
+      .json({ message: 'Ingredient deleted successfully', deletedIngredient: result.rows[0] });
+  } catch (error) {
+    console.error('Error deleting ingredient:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export { getIngredients, addIngredient, deleteIngredient };

@@ -14,8 +14,10 @@ const addIngredient = async (req, res) => {
   try {
     const { name, unit_of_measure, current_stock, alert_threshold } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ error: 'Ingredient name is required' });
+    if (!name || !unit_of_measure || current_stock === undefined || alert_threshold === undefined) {
+      return res.status(400).json({
+        error: 'All fields (name, unit_of_measure, current_stock, alert_threshold) are required!',
+      });
     }
 
     const result = await db.query(
@@ -47,4 +49,34 @@ const deleteIngredient = async (req, res) => {
   }
 };
 
-export { getIngredients, addIngredient, deleteIngredient };
+const updateIngredient = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, unit_of_measure, current_stock, alert_threshold } = req.body;
+
+    if (!name || !unit_of_measure || current_stock === undefined || alert_threshold === undefined) {
+      return res.status(400).json({
+        error: 'All fields are required for updating an ingredient!',
+      });
+    }
+    const result = await db.query(
+      `UPDATE Ingredient
+      SET name = $1, unit_of_measure = $2, current_stock = $3, alert_threshold = $4
+      WHERE id = $5
+      RETURNING *`,
+      [name, unit_of_measure, current_stock, alert_threshold, id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Ingredient not found!' });
+    }
+    res.status(200).json({
+      message: 'Ingredient updated succesfully!',
+      updatedIngredient: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error updating ingredient:', error);
+    res.status(500).json({ error: 'Internal server error!' });
+  }
+};
+
+export { getIngredients, addIngredient, deleteIngredient, updateIngredient };

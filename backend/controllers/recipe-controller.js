@@ -71,4 +71,24 @@ const getRecipes = async (req, res) => {
   }
 };
 
-export { addRecipe, getRecipes };
+const deleteRecipe = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(`DELETE FROM Recipe WHERE id = $1 RETURNING *`, [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Recipe not found!' });
+    }
+
+    res.status(200).json({
+      message: 'Recipe deleted successfully!',
+      deletedRecipe: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error deleting recipe:', error);
+    res.status(500).json({ error: 'Internal server error while deleting recipe.' });
+  }
+};
+
+export { addRecipe, getRecipes, deleteRecipe };

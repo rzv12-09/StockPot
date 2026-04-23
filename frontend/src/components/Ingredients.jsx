@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { getIngredients, addIngredient, deleteIngredient } from '../services/ingredientsService';
 
 const Ingredients = () => {
-  // ... [Logica ta de state și funcțiile exact cum mi le-ai dat] ...
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // State pentru a ascunde/arăta formularul
+  const [showForm, setShowForm] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     unit_of_measure: '',
@@ -41,6 +44,7 @@ const Ingredients = () => {
         alert_threshold: Number(formData.alert_threshold),
       });
       setFormData({ name: '', unit_of_measure: '', current_stock: '', alert_threshold: '' });
+      setShowForm(false); // Ascundem formularul după salvare
       loadIngredients();
     } catch (err) {
       alert(err.message);
@@ -60,126 +64,249 @@ const Ingredients = () => {
   if (isLoading) return <div className="text-slate-500 font-body">Loading ingredients...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
+  // Calculăm statisticile dinamic, direct din datele tale
+  const totalItems = ingredients.length;
+  const lowStockItems = ingredients.filter(
+    (ing) => ing.current_stock <= ing.alert_threshold
+  ).length;
+
   return (
-    <>
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+    <div className="flex-1">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <h2 className="font-manrope text-4xl lg:text-5xl text-orange-900 font-bold tracking-tight mb-2">
+          <h2 className="font-manrope text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
             Inventory Management
           </h2>
-          <p className="font-body text-slate-500 text-lg">
-            Manage stock levels and alerts for raw materials.
+          <p className="font-body text-slate-500 text-sm max-w-2xl">
+            Monitor stock levels, set minimum thresholds, and ensure continuous availability of
+            essential ingredients.
           </p>
         </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 bg-gradient-to-b from-orange-600 to-orange-700 text-white px-6 py-3 rounded-md font-manrope font-semibold shadow-sm hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {showForm ? 'close' : 'add'}
+          </span>
+          {showForm ? 'Cancel' : 'Add New Ingredient'}
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Left Form */}
-        <div className="xl:col-span-1">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white rounded-[1.5rem] p-8 shadow-sm border border-slate-100 flex flex-col gap-4"
-          >
-            <h3 className="font-manrope text-2xl font-bold text-slate-800 mb-2 flex items-center gap-2">
-              <span className="material-symbols-outlined text-orange-600">inventory_2</span> Add
-              Material
-            </h3>
-
+      {/* Formularul ascuns (apare doar când dăm click pe butonul de mai sus) */}
+      {showForm && (
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 mb-8 items-end animate-fade-in-down"
+        >
+          <div className="flex-1 w-full">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+              Name
+            </label>
             <input
               type="text"
               name="name"
-              placeholder="Name (e.g. Potatoes)"
+              placeholder="e.g. Potatoes"
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
             />
+          </div>
+          <div className="w-full md:w-32">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+              Unit
+            </label>
             <input
               type="text"
               name="unit_of_measure"
-              placeholder="Unit (e.g. kg, L)"
+              placeholder="kg, L"
               value={formData.unit_of_measure}
               onChange={handleInputChange}
               required
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
             />
+          </div>
+          <div className="w-full md:w-32">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+              Stock
+            </label>
             <input
               type="number"
               name="current_stock"
-              placeholder="Current Stock"
+              placeholder="0.00"
               value={formData.current_stock}
               onChange={handleInputChange}
               required
               step="0.01"
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
             />
+          </div>
+          <div className="w-full md:w-32">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+              Alert At
+            </label>
             <input
               type="number"
               name="alert_threshold"
-              placeholder="Alert Threshold"
+              placeholder="0.00"
               value={formData.alert_threshold}
               onChange={handleInputChange}
               required
               step="0.01"
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
             />
+          </div>
+          <button
+            type="submit"
+            className="w-full md:w-auto bg-orange-100 text-orange-800 hover:bg-orange-200 font-bold px-6 py-2.5 rounded-lg transition-colors h-[42px]"
+          >
+            Save
+          </button>
+        </form>
+      )}
 
-            <button
-              type="submit"
-              className="w-full mt-4 bg-gradient-to-b from-orange-600 to-orange-700 text-white font-manrope font-semibold px-6 py-3.5 rounded-xl shadow-lg hover:-translate-y-0.5 transition-all"
-            >
-              Save to Inventory
-            </button>
-          </form>
+      {/* Stats/Filter Row (Asymmetric) */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+        <div className="md:col-span-8 flex gap-4">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6 flex-1 relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <h3 className="font-manrope text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider">
+              Total Items
+            </h3>
+            <div className="text-3xl font-manrope font-bold text-slate-900">{totalItems}</div>
+          </div>
+          <div className="bg-red-50 border border-red-100 rounded-xl p-6 flex-1 relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <h3 className="font-manrope text-sm font-semibold text-red-800 mb-1 uppercase tracking-wider">
+              Low Stock Alerts
+            </h3>
+            <div className="flex items-end gap-2">
+              <div className="text-3xl font-manrope font-bold text-red-900">{lowStockItems}</div>
+              <span className="material-symbols-outlined text-red-600 mb-1 text-[20px]">
+                warning
+              </span>
+            </div>
+          </div>
         </div>
+        <div className="md:col-span-4 bg-slate-100 rounded-xl p-6 flex flex-col justify-center">
+          <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
+            Quick Filter
+          </label>
+          <select className="w-full bg-white border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20">
+            <option>All Categories</option>
+            <option>Vegetables</option>
+            <option>Meats & Proteins</option>
+            <option>Spices & Seasonings</option>
+            <option>Dairy</option>
+          </select>
+        </div>
+      </div>
 
-        {/* Right List */}
-        <div className="xl:col-span-2">
-          <div className="bg-white rounded-[1.5rem] shadow-sm border border-slate-100 overflow-hidden">
-            <table className="w-full text-left text-sm font-body text-slate-600">
-              <thead className="bg-slate-50 text-slate-800 font-manrope text-xs uppercase tracking-wider border-b border-slate-200">
-                <tr>
-                  <th className="px-6 py-4">Ingredient Name</th>
-                  <th className="px-6 py-4">Stock</th>
-                  <th className="px-6 py-4">Alert At</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {ingredients.map((ingredient) => {
-                  const isLowStock = ingredient.current_stock <= ingredient.alert_threshold;
-                  return (
-                    <tr key={ingredient.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4 font-semibold text-slate-800">{ingredient.name}</td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-2.5 py-1 rounded-md text-xs font-bold ${
-                            isLowStock ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                          }`}
-                        >
-                          {ingredient.current_stock} {ingredient.unit_of_measure}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-slate-400">
-                        {ingredient.alert_threshold} {ingredient.unit_of_measure}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => handleDelete(ingredient.id)}
-                          className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"
-                        >
-                          <span className="material-symbols-outlined text-xl">delete</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      {/* Main Data Table */}
+      <div className="bg-white border border-slate-100 shadow-sm rounded-xl pb-4">
+        <div className="w-full text-left font-body">
+          {/* Header Row */}
+          <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 border-b border-slate-100 rounded-t-xl mb-2">
+            <div className="col-span-4 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Ingredient Name
+            </div>
+            <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Unit
+            </div>
+            <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Current Stock
+            </div>
+            <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Min. Alert
+            </div>
+            <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
+              Actions
+            </div>
+          </div>
+
+          {/* Data Rows */}
+          <div className="space-y-1 px-2">
+            {ingredients.map((ingredient) => {
+              const isLowStock = ingredient.current_stock <= ingredient.alert_threshold;
+
+              return (
+                <div
+                  key={ingredient.id}
+                  className={`grid grid-cols-12 gap-4 px-4 py-4 rounded-lg items-center group relative overflow-hidden transition-colors ${
+                    isLowStock
+                      ? 'bg-red-50/50 border-l-4 border-red-500'
+                      : 'bg-white hover:bg-slate-50'
+                  }`}
+                >
+                  {/* Left-side red border for low stock is handled by the border-l-4 class above */}
+
+                  <div className="col-span-4 flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        isLowStock ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-orange-700'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[20px]">
+                        {isLowStock ? 'local_fire_department' : 'grocery'}
+                      </span>
+                    </div>
+                    <div>
+                      <div
+                        className={`font-semibold text-sm flex items-center gap-2 ${
+                          isLowStock ? 'text-red-700' : 'text-slate-800'
+                        }`}
+                      >
+                        {ingredient.name}
+                        {isLowStock && (
+                          <span className="material-symbols-outlined text-[16px] text-red-500">
+                            warning
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2 text-sm text-slate-500 font-medium">
+                    {ingredient.unit_of_measure}
+                  </div>
+
+                  <div
+                    className={`col-span-2 text-sm font-bold ${
+                      isLowStock ? 'text-red-600' : 'text-slate-800'
+                    }`}
+                  >
+                    {ingredient.current_stock}
+                  </div>
+
+                  <div className="col-span-2 text-sm text-slate-500">
+                    {ingredient.alert_threshold}
+                  </div>
+
+                  <div className="col-span-2 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleDelete(ingredient.id)}
+                      className="w-8 h-8 rounded-md bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-600 flex items-center justify-center transition-colors"
+                      title="Delete"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Mesaj când nu există ingrediente */}
+            {ingredients.length === 0 && (
+              <div className="text-center py-8 text-slate-500 font-medium">
+                No ingredients found. Click "Add New Ingredient" to start!
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

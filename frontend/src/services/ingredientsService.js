@@ -1,7 +1,12 @@
+import { getAuthHeaders } from '../utils/apiUtils';
+
 const baseUrl = import.meta.env.VITE_API_URL;
 
 export const getIngredients = async () => {
-  const response = await fetch(`${baseUrl}/api/ingredients`);
+  const response = await fetch(`${baseUrl}/api/ingredients`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
   if (!response.ok) {
     throw new Error('Failed to fetch inredients from server');
   }
@@ -11,7 +16,7 @@ export const getIngredients = async () => {
 export const addIngredient = async (ingredientData) => {
   const response = await fetch(`${baseUrl}/api/ingredients`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(ingredientData),
   });
   if (!response.ok) throw new Error('Failed to add ingredient');
@@ -21,7 +26,7 @@ export const addIngredient = async (ingredientData) => {
 export const updateIngredient = async (id, ingredientData) => {
   const response = await fetch(`${baseUrl}/api/ingredients/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(ingredientData),
   });
   if (!response.ok) throw new Error('Failed to update ingredient');
@@ -31,6 +36,7 @@ export const updateIngredient = async (id, ingredientData) => {
 export const deleteIngredient = async (id) => {
   const response = await fetch(`${baseUrl}/api/ingredients/${id}`, {
     method: 'DELETE',
+    headers: getAuthHeaders(),
   });
   if (!response.ok) throw new Error('Failed to delete ingredient');
   return await response.json();

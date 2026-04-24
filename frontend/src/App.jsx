@@ -1,9 +1,10 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import Ingredients from './components/Ingredients';
 import Recipes from './components/Recipes';
+import Login from './components/Login'; // Importăm noua pagină de login
 
-// O componentă mică pentru a evidenția butonul activ din meniu
+// Componenta pentru butoanele din meniu
 const NavItem = ({ to, icon, label }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
@@ -29,7 +30,11 @@ const NavItem = ({ to, icon, label }) => {
   );
 };
 
-function AppContent() {
+// Componenta principală care conține interfața (se randează DOAR dacă suntem logați)
+function AppContent({ user, onLogout }) {
+  // Verificăm dacă user-ul este manager pentru a-i da permisiuni speciale
+  const isManager = user?.role === 'MANAGER';
+
   return (
     <div className="bg-slate-50 text-slate-900 font-body antialiased h-screen flex overflow-hidden">
       {/* SIDEBAR GLOBAL */}
@@ -53,7 +58,10 @@ function AppContent() {
 
         <div className="flex-1 flex flex-col font-manrope tracking-tight text-sm">
           <NavItem to="/" icon="dashboard" label="Dashboard" />
-          <NavItem to="/ingredients" icon="inventory_2" label="Inventory" />
+
+          {/* Ascundem tab-ul de inventar dacă NU ești manager */}
+          {isManager && <NavItem to="/ingredients" icon="inventory_2" label="Inventory" />}
+
           <NavItem to="/recipes" icon="menu_book" label="Recipes" />
         </div>
       </nav>
@@ -63,34 +71,53 @@ function AppContent() {
         {/* HEADER GLOBAL */}
         <header className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-sm flex items-center justify-between px-8 h-16 font-manrope font-medium text-sm">
           <div className="flex items-center gap-6">
-            <div className="hidden md:block text-lg font-black text-slate-900">Ciorbarie</div>
+            <div className="hidden md:block text-lg font-black text-slate-900">
+              StockPot Workspace
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200">
-              <div className="w-8 h-8 rounded-full bg-orange-200 flex items-center justify-center text-orange-800 font-bold">
-                R
-              </div>
-              <span className="font-semibold text-slate-700">Razvan O.</span>
+
+          {/* Zona din dreapta cu profilul și logout */}
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-end">
+              <span className="font-bold text-slate-800 text-sm">{user?.username}</span>
+              <span className="text-xs font-bold text-orange-600 bg-orange-100 px-2 rounded-full mt-0.5">
+                {user?.role}
+              </span>
+            </div>
+
+            {/* Buton de Logout */}
+            <button
+              onClick={onLogout}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+              title="Logout"
+            >
+              <span className="material-symbols-outlined text-[22px]">logout</span>
             </button>
           </div>
         </header>
 
-        {/* CANVA PENTRU COMPONENTE DINAMICE (Aici se randează paginile) */}
+        {/* CANVA PENTRU COMPONENTE DINAMICE */}
         <main className="flex-1 overflow-y-auto p-8 lg:p-12 pb-24">
           <Routes>
             <Route
               path="/"
               element={
                 <div>
-                  <h2 className="font-manrope text-4xl text-orange-900 font-bold mb-2">
-                    Welcome back, Razvan!
+                  <h2 className="font-manrope text-4xl text-slate-900 font-extrabold mb-2 tracking-tight">
+                    Welcome back, {user?.username}! 👋
                   </h2>
-                  <p className="text-slate-500">Select a module from the left menu.</p>
+                  <p className="text-slate-500 font-body">
+                    Select a module from the left menu to get started.
+                  </p>
                 </div>
               }
             />
-            <Route path="/ingredients" element={<Ingredients />} />
+            {/* Rute protejate și pe frontend */}
+            {isManager && <Route path="/ingredients" element={<Ingredients />} />}
             <Route path="/recipes" element={<Recipes />} />
+
+            {/* Dacă bagă un URL invalid, îl trimitem la Dashboard */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>
@@ -98,10 +125,35 @@ function AppContent() {
   );
 }
 
+// Componenta "Părinte" care decide ce să afișeze (Login sau Aplicația)
 function App() {
+  // 1. Verificăm dacă avem deja user-ul salvat în browser (ex: după un refresh)
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
+  // 2. Funcție apelată când logarea are succes din <Login />
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
+  };
+
+  // 3. Funcție pentru Logout
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Ștergem legitimația
+    localStorage.removeItem('user'); // Ștergem datele userului
+    setUser(null); // Resetăm state-ul pentru a afișa ecranul de login
+  };
+
+  // Zidul de securitate: Dacă nu avem user, arată DOAR pagina de login!
+  if (!user) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // Dacă avem user, randăm aplicația cu tot cu React Router
   return (
     <BrowserRouter>
-      <AppContent />
+      <AppContent user={user} onLogout={handleLogout} />
     </BrowserRouter>
   );
 }

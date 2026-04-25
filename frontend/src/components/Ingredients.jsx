@@ -67,7 +67,7 @@ const Ingredients = () => {
   // Calculăm statisticile dinamic, direct din datele tale
   const totalItems = ingredients.length;
   const lowStockItems = ingredients.filter(
-    (ing) => ing.current_stock <= ing.alert_threshold
+    (ing) => Number(ing.current_stock) <= Number(ing.alert_threshold)
   ).length;
 
   return (
@@ -229,7 +229,7 @@ const Ingredients = () => {
           {/* Data Rows */}
           <div className="space-y-1 px-2">
             {ingredients.map((ingredient) => {
-              const isLowStock = ingredient.current_stock <= ingredient.alert_threshold;
+              const isLowStock = Number(ingredient.current_stock) <= Number(ingredient.alert_threshold);
 
               return (
                 <div

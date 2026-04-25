@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react
 import Ingredients from './components/Ingredients';
 import Recipes from './components/Recipes';
 import Login from './components/Login'; // Importăm noua pagină de login
+import Production from './components/Production';
 
 // Componenta pentru butoanele din meniu
 const NavItem = ({ to, icon, label }) => {
@@ -63,6 +64,7 @@ function AppContent({ user, onLogout }) {
           {isManager && <NavItem to="/ingredients" icon="inventory_2" label="Inventory" />}
 
           <NavItem to="/recipes" icon="menu_book" label="Recipes" />
+          <NavItem to="/production" icon="soup_kitchen" label="Production" />
         </div>
       </nav>
 
@@ -115,8 +117,7 @@ function AppContent({ user, onLogout }) {
             {/* Rute protejate și pe frontend */}
             {isManager && <Route path="/ingredients" element={<Ingredients />} />}
             <Route path="/recipes" element={<Recipes />} />
-
-            {/* Dacă bagă un URL invalid, îl trimitem la Dashboard */}
+            <Route path="/production" element={<Production />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

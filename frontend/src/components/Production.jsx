@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { getRecipes } from '../services/recipeService';
-import { getCookedStock, createProductionBatch } from '../services/productionService';
+import {
+  getCookedStock,
+  createProductionBatch,
+  getProductionPreview,
+} from '../services/productionService';
 
 const Production = () => {
   const [recipes, setRecipes] = useState([]);
   const [stock, setStock] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState('');
   const [quantity, setQuantity] = useState(1);
+
+  // State-uri noi pentru Preview
+  const [previewData, setPreviewData] = useState([]);
+  const [canProduce, setCanProduce] = useState(false);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Încărcăm rețetele și stocul gătit la montarea componentei
+  // 1. Încărcarea inițială (Rețete și Frigider)
   useEffect(() => {
     fetchData();
   }, []);
@@ -28,6 +38,31 @@ const Production = () => {
     }
   };
 
+  // 2. Efectul "Ascultător" - Se activează când schimbi rețeta sau cantitatea
+  useEffect(() => {
+    if (selectedRecipe && quantity > 0) {
+      fetchPreview();
+    }
+  }, [selectedRecipe, quantity]);
+
+  const fetchPreview = async () => {
+    setIsPreviewLoading(true);
+    try {
+      const data = await getProductionPreview({
+        recipe_id: selectedRecipe,
+        quantity_produced: quantity,
+      });
+      setPreviewData(data.ingredients);
+      setCanProduce(data.canProduce); // Dacă avem stoc pe minus, asta va fi "false"
+    } catch (err) {
+      setPreviewData([]);
+      setCanProduce(false);
+    } finally {
+      setIsPreviewLoading(false);
+    }
+  };
+
+  // 3. Confirmarea producției reale
   const handleProduction = async () => {
     setError('');
     setSuccess('');
@@ -38,8 +73,8 @@ const Production = () => {
         quantity_produced: quantity,
       });
       setSuccess('Production batch recorded! Inventory updated.');
-      setQuantity(1);
-      fetchData(); // Reîncărcăm stocul după gătire
+      setQuantity(1); // Resetăm cantitatea
+      fetchData(); // Reîncărcăm frigiderul
     } catch (err) {
       setError(err.message);
     } finally {
@@ -86,7 +121,7 @@ const Production = () => {
                   <select
                     value={selectedRecipe}
                     onChange={(e) => setSelectedRecipe(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pl-4 pr-10 text-slate-900 font-body focus:bg-white focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 appearance-none transition-colors"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pl-4 pr-10 text-slate-900 font-body focus:bg-white focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 appearance-none transition-colors cursor-pointer"
                   >
                     {recipes.map((r) => (
                       <option key={r.id} value={r.id}>
@@ -117,7 +152,7 @@ const Production = () => {
                     Est. Portions
                   </label>
                   <div className="w-full bg-slate-100 rounded-lg py-3 px-4 text-slate-900 text-center text-lg font-bold">
-                    {quantity * 10} {/* Placeholder calcul estimativ */}
+                    {quantity * 10}
                   </div>
                 </div>
               </div>
@@ -135,30 +170,83 @@ const Production = () => {
               Review ingredients before confirming.
             </p>
 
-            <div className="space-y-4 mb-8">
-              {/* Ingredient Row Static pentru design */}
-              <div className="flex items-center justify-between group">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-slate-600">
-                    <span className="material-symbols-outlined text-sm">kitchen</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-900 text-sm font-body">
-                      Required Ingredients
-                    </p>
-                    <p className="text-xs text-slate-500 font-body">
-                      Will be calculated upon submit
-                    </p>
-                  </div>
+            {/* Listă Dinamică Ingrediente */}
+            <div className="space-y-4 mb-8 max-h-[300px] overflow-y-auto pr-2">
+              {isPreviewLoading ? (
+                <div className="flex justify-center py-6 text-orange-600">
+                  <span className="material-symbols-outlined animate-spin text-3xl">refresh</span>
                 </div>
-              </div>
+              ) : previewData.length === 0 ? (
+                <p className="text-center text-sm text-slate-500 py-4">
+                  No ingredients required for this recipe.
+                </p>
+              ) : (
+                previewData.map((item, index) => {
+                  const isShortage = Number(item.projected_stock) < 0;
+
+                  return (
+                    <div key={index} className="flex items-center justify-between group">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-8 h-8 rounded flex items-center justify-center ${
+                            isShortage ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          <span className="material-symbols-outlined text-sm">
+                            {isShortage ? 'warning' : 'kitchen'}
+                          </span>
+                        </div>
+                        <div>
+                          <p
+                            className={`font-medium text-sm font-body ${
+                              isShortage ? 'text-red-700 font-bold' : 'text-slate-900'
+                            }`}
+                          >
+                            {item.ingredient_name}
+                          </p>
+                          <p className="text-xs text-slate-500 font-body">
+                            Current: {item.current_stock}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p
+                          className={`font-bold text-sm font-body ${
+                            isShortage ? 'text-red-600' : 'text-slate-700'
+                          }`}
+                        >
+                          - {item.total_needed}
+                        </p>
+                        <p
+                          className={`text-xs font-bold font-body transition-colors ${
+                            isShortage
+                              ? 'text-red-600'
+                              : 'text-slate-400 group-hover:text-slate-600'
+                          }`}
+                        >
+                          New: {item.projected_stock}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
+
+            {/* Mesaj de eroare dacă nu avem stoc destul */}
+            {!canProduce && !isPreviewLoading && previewData.length > 0 && (
+              <div className="mb-4 bg-red-50 text-red-700 text-sm p-3 rounded-lg border border-red-200 flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">error</span>
+                Insufficient stock for one or more ingredients!
+              </div>
+            )}
 
             <div className="pt-6 border-t border-slate-100">
               <button
                 onClick={handleProduction}
-                disabled={isLoading}
-                className="w-full bg-gradient-to-b from-orange-600 to-orange-700 text-white rounded-lg py-4 px-6 font-bold font-manrope text-lg shadow-lg shadow-orange-600/30 hover:shadow-orange-600/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:translate-y-0"
+                // Butonul e dezactivat dacă: se încarcă ORICE, sau nu putem produce din lipsă stoc
+                disabled={isLoading || isPreviewLoading || !canProduce || previewData.length === 0}
+                className="w-full bg-gradient-to-b from-orange-600 to-orange-700 text-white rounded-lg py-4 px-6 font-bold font-manrope text-lg shadow-lg shadow-orange-600/30 hover:shadow-orange-600/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <span className="material-symbols-outlined animate-spin">refresh</span>
@@ -167,7 +255,7 @@ const Production = () => {
                     className="material-symbols-outlined"
                     style={{ fontVariationSettings: "'FILL' 1" }}
                   >
-                    check_circle
+                    {canProduce ? 'check_circle' : 'block'}
                   </span>
                 )}
                 {isLoading ? 'Processing...' : 'Confirm Production'}
@@ -180,7 +268,8 @@ const Production = () => {
         </div>
       </div>
 
-      {/* CAMERA FRIGORIFICĂ (Stocul Gătit) */}
+      {/* CAMERA FRIGORIFICĂ (Tabel Stoc) */}
+      {/* ... [Tabelul rămâne neschimbat] ... */}
       <div>
         <h3 className="text-2xl font-manrope font-bold mb-6 text-slate-900 flex items-center gap-2">
           <span className="material-symbols-outlined text-blue-500">ac_unit</span>

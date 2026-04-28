@@ -96,3 +96,40 @@ export const getCookedStock = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getProductionPreview = async (req, res) => {
+  const { recipe_id, quantity_produced } = req.body;
+
+  if (!recipe_id || !quantity_produced || quantity_produced <= 0) {
+    return res.status(400).json({ error: 'Recipe ID and quantity are required.' });
+  }
+
+  try {
+    const query = `
+      SELECT 
+        i.name as ingredient_name,
+        i.current_stock,
+        ri.quantity_required as qty_per_unit,
+        (ri.quantity_required * $2) as total_needed,
+        (i.current_stock - (ri.quantity_required * $2)) as projected_stock
+      FROM Recipe_Ingredient ri
+      JOIN Ingredient i ON ri.ingredient_id = i.id
+      WHERE ri.recipe_id = $1
+    `;
+
+    const { rows: previewData } = await db.query(query, [recipe_id, quantity_produced]);
+
+    if (previewData.length === 0) {
+      return res.status(404).json({ error: 'Recipe has no ingredients or does not exist.' });
+    }
+
+    const hasShortage = previewData.some((item) => Number(item.projected_stock) < 0);
+
+    res.json({
+      canProduce: !hasShortage,
+      ingredients: previewData,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

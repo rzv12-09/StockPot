@@ -10,6 +10,19 @@ export const getCookedStock = async () => {
   return await response.json();
 };
 
+export const getProductionPreview = async (data) => {
+  const response = await fetch(`${baseUrl}/api/production/preview`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to fetch preview');
+  }
+  return await response.json();
+};
+
 export const createProductionBatch = async (data) => {
   const response = await fetch(`${baseUrl}/api/production`, {
     method: 'POST',

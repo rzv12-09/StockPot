@@ -34,7 +34,7 @@ const Production = () => {
       setStock(stockData);
       if (recipesData.length > 0) setSelectedRecipe(recipesData[0].id);
     } catch (err) {
-      setError('Failed to load data.');
+      setError('Failed to load data.' + err);
     }
   };
 
@@ -55,6 +55,7 @@ const Production = () => {
       setPreviewData(data.ingredients);
       setCanProduce(data.canProduce); // Dacă avem stoc pe minus, asta va fi "false"
     } catch (err) {
+      console.error(err);
       setPreviewData([]);
       setCanProduce(false);
     } finally {

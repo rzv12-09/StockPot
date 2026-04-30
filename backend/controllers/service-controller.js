@@ -72,3 +72,20 @@ export const executeTransfer = async (req, res) => {
     client.release();
   }
 };
+
+export const emptySlot = async (req, res) => {
+  const { slot_id } = req.body;
+
+  if (!slot_id) {
+    return res.status(400).json({ error: 'Slot ID is required.' });
+  }
+
+  try {
+    await db.query(`UPDATE Serving_Slots SET recipe_id = NULL WHERE id = $1`, [slot_id]);
+
+    res.json({ message: 'Pan emptied successfully!' });
+  } catch (error) {
+    console.error('Empty slot error:', error);
+    res.status(500).json({ error: 'Failed to empty the pan.' });
+  }
+};

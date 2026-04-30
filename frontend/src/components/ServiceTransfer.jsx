@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCookedStock } from '../services/productionService';
-import { getServingSlots, executeTransfer } from '../services/transferService';
+import { emptyServingSlot, getServingSlots, executeTransfer } from '../services/transferService';
 
 const ServiceTransfer = () => {
   const [fridgeStock, setFridgeStock] = useState([]);
@@ -22,7 +22,8 @@ const ServiceTransfer = () => {
       setFridgeStock(stockData.filter((item) => item.current_quantity > 0)); // Arătăm doar ce e în stoc
       setServingSlots(slotsData);
     } catch (err) {
-      setError('Failed to load transfer data.', err);
+      setError('Failed to load transfer data.');
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -54,6 +55,24 @@ const ServiceTransfer = () => {
       setError(err.message);
     } finally {
       setIsTransferring(false);
+    }
+  };
+
+  const handleEmptySlot = async (slotId) => {
+    // O mică confirmare ca să nu golească din greșeală
+    if (!window.confirm('Are you sure you want to empty this pan?')) return;
+
+    setError('');
+    setSuccess('');
+
+    try {
+      await emptyServingSlot(slotId);
+      setSuccess('Pan emptied successfully!');
+      // Dacă slotul pe care l-am golit era cumva selectat, îl deselectăm
+      if (selectedSlot?.id === slotId) setSelectedSlot(null);
+      await fetchData(); // Reîncărcăm datele
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -203,36 +222,46 @@ const ServiceTransfer = () => {
                   return (
                     <div
                       key={slot.id}
-                      className="bg-slate-50 rounded-xl p-5 border border-slate-200 shadow-sm"
+                      className="bg-slate-50 rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between gap-4"
                     >
-                      <div className="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-orange-500">
-                            local_fire_department
+                      <div>
+                        <div className="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-orange-500">
+                              local_fire_department
+                            </span>
+                            <h4 className="font-manrope font-bold text-slate-900">
+                              {slot.slot_name}
+                            </h4>
+                          </div>
+                          <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded">
+                            Occupied
                           </span>
-                          <h4 className="font-manrope font-bold text-slate-900">
-                            {slot.slot_name}
-                          </h4>
                         </div>
-                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded">
-                          Occupied
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <div>
-                          <p className="font-medium text-slate-900">{slot.recipe_name}</p>
-                          <p className="text-xs text-slate-500 mt-1">
-                            Filled:{' '}
-                            {new Date(slot.last_filled_at).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-manrope font-bold text-lg text-orange-600">1 M</p>
+                        <div className="flex justify-between items-end mb-2">
+                          <div>
+                            <p className="font-medium text-slate-900">{slot.recipe_name}</p>
+                            <p className="text-xs text-slate-500 mt-1">
+                              Filled:{' '}
+                              {new Date(slot.last_filled_at).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-manrope font-bold text-lg text-orange-600">1 M</p>
+                          </div>
                         </div>
                       </div>
+
+                      <button
+                        onClick={() => handleEmptySlot(slot.id)}
+                        className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                        Empty Pan
+                      </button>
                     </div>
                   );
                 }

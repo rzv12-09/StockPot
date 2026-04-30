@@ -22,3 +22,16 @@ export const executeTransfer = async (data) => {
   }
   return await response.json();
 };
+
+export const emptyServingSlot = async (slotId) => {
+  const response = await fetch(`${baseUrl}/api/service/empty`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ slot_id: slotId }),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to empty slot');
+  }
+  return await response.json();
+};

@@ -7,30 +7,31 @@ const registerUser = async (req, res) => {
   const { username, password, role } = req.body;
 
   if (!username || !password || !role) {
-    return res.status(400).json({ error: 'Username, password and role are required!' });
+    return res.status(400).json({ error: 'Username, password and requested role are required.' });
   }
 
   try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const result = await db.query(
-      `INSERT INTO Users (username, password_hash, role) 
-       VALUES ($1, $2, $3) 
-       RETURNING id, username, role`,
-      [username, hashedPassword, role]
-    );
+    const query = `
+      INSERT INTO Users (username, password_hash, role, status) 
+      VALUES ($1, $2, $3, 'PENDING') 
+      RETURNING id, username, role, status
+    `;
+    const { rows } = await db.query(query, [username, hashedPassword, role]);
 
     res.status(201).json({
-      message: 'User created successfully',
-      user: result.rows[0],
+      message: 'Registration successful! Waiting for manager approval.',
+      user: rows[0],
     });
   } catch (error) {
-    console.error('Error registering user:', error);
+    // Verificăm dacă username-ul există deja (Eroare de constrângere unică în Postgres)
     if (error.code === '23505') {
-      return res.status(400).json({ error: 'Username already exists!' });
+      return res.status(400).json({ error: 'Username already exists.' });
     }
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Register error:', error);
+    res.status(500).json({ error: 'Registration failed.' });
   }
 };
 
@@ -45,6 +46,14 @@ const loginUser = async (req, res) => {
     }
 
     const user = result.rows[0];
+
+    if (user.status === 'PENDING') {
+      return res.status(403).json({ error: 'Your account is pending manager approval.' });
+    }
+    if (user.status === 'REJECTED') {
+      return res.status(403).json({ error: 'Your account request was rejected.' });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
     if (!isPasswordValid) {

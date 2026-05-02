@@ -6,7 +6,7 @@ import Login from './components/Login'; // Importăm noua pagină de login
 import Production from './components/Production';
 import SoupInventory from './components/SoupInventory';
 import ServiceTransfer from './components/ServiceTransfer';
-
+import UsersManagement from './components/UserManagement';
 // Componenta pentru butoanele din meniu
 const NavItem = ({ to, icon, label }) => {
   const location = useLocation();
@@ -69,6 +69,7 @@ function AppContent({ user, onLogout }) {
           <NavItem to="/production" icon="soup_kitchen" label="Production" />
           <NavItem to="/soup-inventory" icon="kitchen" label="Cold Storage" />
           <NavItem to="/transfer" icon="swap_horiz" label="Transfers" />
+          {isManager && <NavItem to="/staff" icon="group" label="Staff" />}
         </div>
       </nav>
 
@@ -125,6 +126,7 @@ function AppContent({ user, onLogout }) {
             <Route path="*" element={<Navigate to="/" replace />} />
             <Route path="/soup-inventory" element={<SoupInventory />} />
             <Route path="/transfer" element={<ServiceTransfer />} />
+            {isManager && <Route path="/staff" element={<UsersManagement />} />}
           </Routes>
         </main>
       </div>

@@ -20,12 +20,12 @@ export const approveUser = async (req, res) => {
   try {
     if (!role) {
       const selectedRole = await db.query(`SELECT Role from users where id = $1`, [id]);
+      if (selectedRole.rows.length === 0) {
+        return res.status(404).json({ error: 'User not found.' });
+      }
       role = selectedRole.rows[0].role;
     }
 
-    if (selectedRole.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found.' });
-    }
     const query = `
       UPDATE Users 
       SET status = 'APPROVED', role = $1 
@@ -55,5 +55,16 @@ export const rejectUser = async (req, res) => {
     res.json({ message: `User ${rows[0].username} rejected and deleted.` });
   } catch (error) {
     res.status(500).json({ error: 'Failed to reject user.' });
+  }
+};
+
+export const getActiveUsers = async (req, res) => {
+  try {
+    const query = `SELECT id, username, role, status FROM Users WHERE status = 'APPROVED' ORDER BY id ASC`;
+    const { rows } = await db.query(query);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching active users:', error);
+    res.status(500).json({ error: 'Failed to fetch active users.' });
   }
 };

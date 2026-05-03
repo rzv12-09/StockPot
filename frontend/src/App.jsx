@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import Ingredients from './components/Ingredients';
 import Recipes from './components/Recipes';
-import Login from './components/Login'; // Importăm noua pagină de login
+import Auth from './components/Auth';
 import Production from './components/Production';
 import SoupInventory from './components/SoupInventory';
 import ServiceTransfer from './components/ServiceTransfer';
@@ -123,10 +123,10 @@ function AppContent({ user, onLogout }) {
             {isManager && <Route path="/ingredients" element={<Ingredients />} />}
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/production" element={<Production />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
             <Route path="/soup-inventory" element={<SoupInventory />} />
             <Route path="/transfer" element={<ServiceTransfer />} />
             {isManager && <Route path="/staff" element={<UsersManagement />} />}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>
@@ -156,7 +156,7 @@ function App() {
 
   // Zidul de securitate: Dacă nu avem user, arată DOAR pagina de login!
   if (!user) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
+    return <Auth onLoginSuccess={handleLoginSuccess} />;
   }
 
   // Dacă avem user, randăm aplicația cu tot cu React Router

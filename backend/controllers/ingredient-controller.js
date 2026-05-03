@@ -12,19 +12,26 @@ const getIngredients = async (req, res) => {
 
 const addIngredient = async (req, res) => {
   try {
-    const { name, unit_of_measure, current_stock, alert_threshold } = req.body;
+    const { name, unit_of_measure, current_stock, alert_threshold, category } = req.body;
 
-    if (!name || !unit_of_measure || current_stock === undefined || alert_threshold === undefined) {
+    if (
+      !name ||
+      !unit_of_measure ||
+      current_stock === undefined ||
+      alert_threshold === undefined ||
+      !category
+    ) {
       return res.status(400).json({
-        error: 'All fields (name, unit_of_measure, current_stock, alert_threshold) are required!',
+        error:
+          'All fields (name, unit_of_measure, current_stock, alert_threshold, category) are required!',
       });
     }
 
     const result = await db.query(
-      `INSERT INTO Ingredient (name, unit_of_measure, current_stock, alert_threshold) 
-       VALUES ($1, $2, $3, $4) 
+      `INSERT INTO Ingredient (name, unit_of_measure, current_stock, alert_threshold, category) 
+       VALUES ($1, $2, $3, $4, $5) 
        RETURNING *`,
-      [name, unit_of_measure, current_stock, alert_threshold]
+      [name, unit_of_measure, current_stock, alert_threshold, category]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
@@ -52,19 +59,25 @@ const deleteIngredient = async (req, res) => {
 const updateIngredient = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, unit_of_measure, current_stock, alert_threshold } = req.body;
+    const { name, unit_of_measure, current_stock, alert_threshold, category } = req.body;
 
-    if (!name || !unit_of_measure || current_stock === undefined || alert_threshold === undefined) {
+    if (
+      !name ||
+      !unit_of_measure ||
+      current_stock === undefined ||
+      alert_threshold === undefined ||
+      !category
+    ) {
       return res.status(400).json({
         error: 'All fields are required for updating an ingredient!',
       });
     }
     const result = await db.query(
       `UPDATE Ingredient
-      SET name = $1, unit_of_measure = $2, current_stock = $3, alert_threshold = $4
-      WHERE id = $5
+      SET name = $1, unit_of_measure = $2, current_stock = $3, alert_threshold = $4, category = $5
+      WHERE id = $6
       RETURNING *`,
-      [name, unit_of_measure, current_stock, alert_threshold, id]
+      [name, unit_of_measure, current_stock, alert_threshold, category, id]
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Ingredient not found!' });

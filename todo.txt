@@ -1,2 +1,3 @@
+sa termin filtrele de categorii pe frontend
+
 sa am istorc in fiecare zi pe supiera cate ciorbe si ce ciorbe au fost in supiera respectiva
-sa am la manger un modul de management pentru useri

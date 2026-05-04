@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getIngredients, addIngredient, deleteIngredient } from '../services/ingredientsService';
+import {
+  getIngredients,
+  addIngredient,
+  deleteIngredient,
+  updateIngredient,
+} from '../services/ingredientsService';
 
 const Ingredients = () => {
   const [ingredients, setIngredients] = useState([]);
@@ -9,6 +14,9 @@ const Ingredients = () => {
 
   // State pentru Modal
   const [showForm, setShowForm] = useState(false);
+
+  // NOU: State pentru a ști dacă suntem în modul "Editare" (și ce ID edităm)
+  const [editingIngredientId, setEditingIngredientId] = useState(null);
 
   // State formular
   const [formData, setFormData] = useState({
@@ -38,15 +46,52 @@ const Ingredients = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // NOU: Funcția apelată când apăsăm pe butonul "Edit" dintr-un rând
+  const handleEditClick = (ingredient) => {
+    setEditingIngredientId(ingredient.id);
+    setFormData({
+      name: ingredient.name,
+      category: ingredient.category || '', // Fallback dacă cumva e null în baza de date veche
+      unit_of_measure: ingredient.unit_of_measure,
+      current_stock: ingredient.current_stock,
+      alert_threshold: ingredient.alert_threshold,
+    });
+    setShowForm(true); // Deschidem modalul, dar cu datele completate!
+  };
+
+  // Funcția apelată la click pe "Add New Ingredient" (resetează totul)
+  const handleAddNewClick = () => {
+    setEditingIngredientId(null); // Ne asigurăm că NU suntem în modul edit
+    setFormData({
+      name: '',
+      category: '',
+      unit_of_measure: '',
+      current_stock: '',
+      alert_threshold: '',
+    });
+    setShowForm(true);
+  };
+
+  // Modificată: Acum știe să facă și Add și Update
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addIngredient({
+      const payload = {
         ...formData,
         current_stock: Number(formData.current_stock),
         alert_threshold: Number(formData.alert_threshold),
-      });
-      // Resetăm formularul și închidem modalul
+      };
+
+      if (editingIngredientId) {
+        // Modul Editare
+        await updateIngredient(editingIngredientId, payload);
+      } else {
+        // Modul Adăugare Nouă
+        await addIngredient(payload);
+      }
+
+      // Resetăm și închidem
+      setEditingIngredientId(null);
       setFormData({
         name: '',
         category: '',
@@ -74,13 +119,13 @@ const Ingredients = () => {
   if (isLoading) return <div className="text-slate-500 font-body">Loading ingredients...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
-  // 1. Filtrăm lista bazat pe categoria selectată
+  // Filtrăm lista bazat pe categoria selectată
   const filteredIngredients =
     selectedCategory === 'All Categories'
       ? ingredients
       : ingredients.filter((ing) => ing.category === selectedCategory);
 
-  // 2. Calculăm statisticile folosind DOAR lista filtrată
+  // Calculăm statisticile folosind DOAR lista filtrată
   const totalItems = filteredIngredients.length;
   const lowStockItems = filteredIngredients.filter(
     (ing) => Number(ing.current_stock) <= Number(ing.alert_threshold)
@@ -99,7 +144,7 @@ const Ingredients = () => {
           </p>
         </div>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={handleAddNewClick} // Modificat pentru a apela funcția dedicată
           className="flex items-center gap-2 bg-gradient-to-b from-orange-600 to-orange-700 text-white px-6 py-3 rounded-md font-manrope font-semibold shadow-sm hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
         >
           <span
@@ -121,9 +166,7 @@ const Ingredients = () => {
           </div>
           {lowStockItems > 0 ? (
             <div className="bg-red-50 border border-red-100 rounded-xl p-6 flex-1 relative overflow-hidden transition-all shadow-sm">
-              {/* Efectul de blur roșu în colț */}
               <div className="absolute right-0 top-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-
               <p className="font-body text-sm font-semibold text-red-800 mb-1 relative z-10">
                 Low Stock Alerts
               </p>
@@ -189,7 +232,6 @@ const Ingredients = () => {
           </div>
 
           <div className="space-y-1 px-2">
-            {/* 3. Folosim filteredIngredients în loc de ingredients */}
             {filteredIngredients.map((ingredient) => {
               const isLowStock =
                 Number(ingredient.current_stock) <= Number(ingredient.alert_threshold);
@@ -249,6 +291,14 @@ const Ingredients = () => {
                   </div>
 
                   <div className="col-span-2 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Buton EDIT adăugat aici */}
+                    <button
+                      onClick={() => handleEditClick(ingredient)}
+                      className="w-8 h-8 rounded-md bg-slate-100 hover:bg-orange-100 hover:text-orange-600 text-slate-600 flex items-center justify-center transition-colors"
+                      title="Edit"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">edit</span>
+                    </button>
                     <button
                       onClick={() => handleDelete(ingredient.id)}
                       className="w-8 h-8 rounded-md bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-600 flex items-center justify-center transition-colors"
@@ -261,7 +311,6 @@ const Ingredients = () => {
               );
             })}
 
-            {/* Mesajul este actualizat pentru a reflecta filtrarea */}
             {filteredIngredients.length === 0 && (
               <div className="text-center py-8 text-slate-500 font-medium">
                 No ingredients found in this category.
@@ -271,7 +320,7 @@ const Ingredients = () => {
         </div>
       </div>
 
-      {/* MODAL OVERLAY - Se randează doar dacă showForm este true */}
+      {/* MODAL OVERLAY - DINAMIC PENTRU ADD SI EDIT */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-6 animate-fade-in">
           {/* Modal Container */}
@@ -279,15 +328,21 @@ const Ingredients = () => {
             {/* Modal Header */}
             <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
               <div>
+                {/* NOU: Titlu dinamic */}
                 <h2 className="font-manrope text-2xl font-bold text-slate-900">
-                  Add New Ingredient
+                  {editingIngredientId ? 'Edit Ingredient' : 'Add New Ingredient'}
                 </h2>
                 <p className="font-body text-sm text-slate-500 mt-1">
-                  Enter the details for the new inventory item.
+                  {editingIngredientId
+                    ? 'Update details for inventory tracking.'
+                    : 'Enter the details for the new inventory item.'}
                 </p>
               </div>
               <button
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingIngredientId(null); // Curățăm state-ul de editare la închidere
+                }}
                 className="text-slate-400 hover:text-orange-600 transition-colors p-2 rounded-full hover:bg-orange-50 focus:outline-none"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -415,8 +470,7 @@ const Ingredients = () => {
                       className="block font-body text-sm font-semibold text-slate-700 mb-2"
                       htmlFor="alert_threshold"
                     >
-                      Alert Threshold{' '}
-                      <span className="text-slate-400 font-normal text-xs ml-1">(Warning)</span>
+                      Min. Alert Threshold
                     </label>
                     <input
                       required
@@ -430,6 +484,9 @@ const Ingredients = () => {
                       type="number"
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-slate-900 font-body text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all"
                     />
+                    <p className="text-xs text-slate-500 mt-1 ml-1 font-body">
+                      Notify when stock falls below this level.
+                    </p>
                   </div>
                 </div>
               </form>
@@ -438,25 +495,28 @@ const Ingredients = () => {
             {/* Modal Footer */}
             <div className="px-8 py-5 bg-slate-50 flex justify-end items-center gap-4 border-t border-slate-100 rounded-b-2xl">
               <button
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingIngredientId(null);
+                }}
                 className="px-6 py-2.5 font-body text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors focus:outline-none"
                 type="button"
               >
                 Cancel
               </button>
-              {/* Butonul e legat de form prin atributul form="addIngredientForm" */}
+              {/* NOU: Buton dinamic și design similar cu referința pentru Edit */}
               <button
                 form="addIngredientForm"
                 type="submit"
-                className="px-6 py-2.5 bg-gradient-to-b from-orange-600 to-orange-700 text-white font-body text-sm font-bold rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all shadow-sm focus:outline-none flex items-center gap-2"
+                className="px-6 py-2.5 bg-gradient-to-b from-orange-600 to-orange-700 text-white font-body text-sm font-bold rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all shadow-sm focus:outline-none flex items-center gap-2 active:scale-95"
               >
                 <span
                   className="material-symbols-outlined text-[18px]"
                   style={{ fontVariationSettings: "'FILL' 1" }}
                 >
-                  add
+                  {editingIngredientId ? 'save' : 'add'}
                 </span>
-                Add Ingredient
+                {editingIngredientId ? 'Save Changes' : 'Add Ingredient'}
               </button>
             </div>
           </div>

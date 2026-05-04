@@ -5,11 +5,12 @@ const Ingredients = () => {
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('All Categories');
 
   // State pentru Modal
   const [showForm, setShowForm] = useState(false);
 
-  // Am adăugat "category" în state-ul formularului
+  // State formular
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -73,8 +74,15 @@ const Ingredients = () => {
   if (isLoading) return <div className="text-slate-500 font-body">Loading ingredients...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
-  const totalItems = ingredients.length;
-  const lowStockItems = ingredients.filter(
+  // 1. Filtrăm lista bazat pe categoria selectată
+  const filteredIngredients =
+    selectedCategory === 'All Categories'
+      ? ingredients
+      : ingredients.filter((ing) => ing.category === selectedCategory);
+
+  // 2. Calculăm statisticile folosind DOAR lista filtrată
+  const totalItems = filteredIngredients.length;
+  const lowStockItems = filteredIngredients.filter(
     (ing) => Number(ing.current_stock) <= Number(ing.alert_threshold)
   ).length;
 
@@ -107,27 +115,54 @@ const Ingredients = () => {
       {/* Stats/Filter Row */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
         <div className="md:col-span-8 flex gap-4">
-          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1">
+          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1 transition-all">
             <p className="font-body text-sm font-semibold text-slate-500 mb-1">Total Ingredients</p>
             <div className="text-2xl font-manrope font-bold text-orange-600">{totalItems}</div>
           </div>
-          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1">
-            <p className="font-body text-sm font-semibold text-slate-500 mb-1">Low Stock Alerts</p>
-            <div className="text-2xl font-manrope font-bold text-red-600">{lowStockItems}</div>
-          </div>
+          {lowStockItems > 0 ? (
+            <div className="bg-red-50 border border-red-100 rounded-xl p-6 flex-1 relative overflow-hidden transition-all shadow-sm">
+              {/* Efectul de blur roșu în colț */}
+              <div className="absolute right-0 top-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+
+              <p className="font-body text-sm font-semibold text-red-800 mb-1 relative z-10">
+                Low Stock Alerts
+              </p>
+              <div className="flex items-center gap-2 relative z-10">
+                <div className="text-2xl font-manrope font-bold text-red-600">{lowStockItems}</div>
+                <span className="material-symbols-outlined text-red-500 text-[20px]">warning</span>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1 transition-all">
+              <p className="font-body text-sm font-semibold text-slate-500 mb-1">
+                Low Stock Alerts
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="text-2xl font-manrope font-bold text-slate-300">0</div>
+                <span className="material-symbols-outlined text-slate-300 text-[20px]">
+                  check_circle
+                </span>
+              </div>
+            </div>
+          )}
         </div>
         <div className="md:col-span-4 bg-slate-100 rounded-xl p-6 flex flex-col justify-center">
           <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
             Quick Filter
           </label>
-          <select className="w-full bg-white border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20">
-            <option>All Categories</option>
-            <option>Vegetables</option>
-            <option>Meat & Poultry</option>
-            <option>Dairy & Eggs</option>
-            <option>Spices & Herbs</option>
-            <option>Dry Goods</option>
-            <option>Liquids</option>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20 cursor-pointer"
+          >
+            <option value="All Categories">All Categories</option>
+            <option value="Vegetables">Vegetables</option>
+            <option value="Meat & Poultry">Meat & Poultry</option>
+            <option value="Dairy & Eggs">Dairy & Eggs</option>
+            <option value="Dry Goods">Dry Goods</option>
+            <option value="Spices & Herbs">Spices & Herbs</option>
+            <option value="Liquids">Liquids</option>
+            <option value="General">General</option>
           </select>
         </div>
       </div>
@@ -154,7 +189,8 @@ const Ingredients = () => {
           </div>
 
           <div className="space-y-1 px-2">
-            {ingredients.map((ingredient) => {
+            {/* 3. Folosim filteredIngredients în loc de ingredients */}
+            {filteredIngredients.map((ingredient) => {
               const isLowStock =
                 Number(ingredient.current_stock) <= Number(ingredient.alert_threshold);
 
@@ -190,7 +226,6 @@ const Ingredients = () => {
                           </span>
                         )}
                       </div>
-                      {/* Badge pentru Categorie adăugat aici */}
                       <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
                         {ingredient.category}
                       </span>
@@ -226,9 +261,10 @@ const Ingredients = () => {
               );
             })}
 
-            {ingredients.length === 0 && (
+            {/* Mesajul este actualizat pentru a reflecta filtrarea */}
+            {filteredIngredients.length === 0 && (
               <div className="text-center py-8 text-slate-500 font-medium">
-                No ingredients found. Click "Add New Ingredient" to start!
+                No ingredients found in this category.
               </div>
             )}
           </div>

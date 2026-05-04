@@ -6,11 +6,13 @@ const Ingredients = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // State pentru a ascunde/arăta formularul
+  // State pentru Modal
   const [showForm, setShowForm] = useState(false);
 
+  // Am adăugat "category" în state-ul formularului
   const [formData, setFormData] = useState({
     name: '',
+    category: '',
     unit_of_measure: '',
     current_stock: '',
     alert_threshold: '',
@@ -43,8 +45,15 @@ const Ingredients = () => {
         current_stock: Number(formData.current_stock),
         alert_threshold: Number(formData.alert_threshold),
       });
-      setFormData({ name: '', unit_of_measure: '', current_stock: '', alert_threshold: '' });
-      setShowForm(false); // Ascundem formularul după salvare
+      // Resetăm formularul și închidem modalul
+      setFormData({
+        name: '',
+        category: '',
+        unit_of_measure: '',
+        current_stock: '',
+        alert_threshold: '',
+      });
+      setShowForm(false);
       loadIngredients();
     } catch (err) {
       alert(err.message);
@@ -64,14 +73,13 @@ const Ingredients = () => {
   if (isLoading) return <div className="text-slate-500 font-body">Loading ingredients...</div>;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
-  // Calculăm statisticile dinamic, direct din datele tale
   const totalItems = ingredients.length;
   const lowStockItems = ingredients.filter(
     (ing) => Number(ing.current_stock) <= Number(ing.alert_threshold)
   ).length;
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 relative">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
@@ -79,115 +87,33 @@ const Ingredients = () => {
             Inventory Management
           </h2>
           <p className="font-body text-slate-500 text-sm max-w-2xl">
-            Monitor stock levels, set minimum thresholds, and ensure continuous availability of
-            essential ingredients.
+            Manage your ingredients and stock levels.
           </p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => setShowForm(true)}
           className="flex items-center gap-2 bg-gradient-to-b from-orange-600 to-orange-700 text-white px-6 py-3 rounded-md font-manrope font-semibold shadow-sm hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
         >
-          <span className="material-symbols-outlined text-[20px]">
-            {showForm ? 'close' : 'add'}
+          <span
+            className="material-symbols-outlined text-[20px]"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            add
           </span>
-          {showForm ? 'Cancel' : 'Add New Ingredient'}
+          Add New Ingredient
         </button>
       </div>
 
-      {/* Formularul ascuns (apare doar când dăm click pe butonul de mai sus) */}
-      {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 mb-8 items-end animate-fade-in-down"
-        >
-          <div className="flex-1 w-full">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              placeholder="e.g. Potatoes"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
-            />
-          </div>
-          <div className="w-full md:w-32">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
-              Unit
-            </label>
-            <input
-              type="text"
-              name="unit_of_measure"
-              placeholder="kg, L"
-              value={formData.unit_of_measure}
-              onChange={handleInputChange}
-              required
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
-            />
-          </div>
-          <div className="w-full md:w-32">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
-              Stock
-            </label>
-            <input
-              type="number"
-              name="current_stock"
-              placeholder="0.00"
-              value={formData.current_stock}
-              onChange={handleInputChange}
-              required
-              step="0.01"
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
-            />
-          </div>
-          <div className="w-full md:w-32">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
-              Alert At
-            </label>
-            <input
-              type="number"
-              name="alert_threshold"
-              placeholder="0.00"
-              value={formData.alert_threshold}
-              onChange={handleInputChange}
-              required
-              step="0.01"
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-600/20"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full md:w-auto bg-orange-100 text-orange-800 hover:bg-orange-200 font-bold px-6 py-2.5 rounded-lg transition-colors h-[42px]"
-          >
-            Save
-          </button>
-        </form>
-      )}
-
-      {/* Stats/Filter Row (Asymmetric) */}
+      {/* Stats/Filter Row */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
         <div className="md:col-span-8 flex gap-4">
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6 flex-1 relative overflow-hidden">
-            <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-            <h3 className="font-manrope text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider">
-              Total Items
-            </h3>
-            <div className="text-3xl font-manrope font-bold text-slate-900">{totalItems}</div>
+          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1">
+            <p className="font-body text-sm font-semibold text-slate-500 mb-1">Total Ingredients</p>
+            <div className="text-2xl font-manrope font-bold text-orange-600">{totalItems}</div>
           </div>
-          <div className="bg-red-50 border border-red-100 rounded-xl p-6 flex-1 relative overflow-hidden">
-            <div className="absolute right-0 top-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-            <h3 className="font-manrope text-sm font-semibold text-red-800 mb-1 uppercase tracking-wider">
-              Low Stock Alerts
-            </h3>
-            <div className="flex items-end gap-2">
-              <div className="text-3xl font-manrope font-bold text-red-900">{lowStockItems}</div>
-              <span className="material-symbols-outlined text-red-600 mb-1 text-[20px]">
-                warning
-              </span>
-            </div>
+          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1">
+            <p className="font-body text-sm font-semibold text-slate-500 mb-1">Low Stock Alerts</p>
+            <div className="text-2xl font-manrope font-bold text-red-600">{lowStockItems}</div>
           </div>
         </div>
         <div className="md:col-span-4 bg-slate-100 rounded-xl p-6 flex flex-col justify-center">
@@ -197,9 +123,11 @@ const Ingredients = () => {
           <select className="w-full bg-white border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20">
             <option>All Categories</option>
             <option>Vegetables</option>
-            <option>Meats & Proteins</option>
-            <option>Spices & Seasonings</option>
-            <option>Dairy</option>
+            <option>Meat & Poultry</option>
+            <option>Dairy & Eggs</option>
+            <option>Spices & Herbs</option>
+            <option>Dry Goods</option>
+            <option>Liquids</option>
           </select>
         </div>
       </div>
@@ -207,7 +135,6 @@ const Ingredients = () => {
       {/* Main Data Table */}
       <div className="bg-white border border-slate-100 shadow-sm rounded-xl pb-4">
         <div className="w-full text-left font-body">
-          {/* Header Row */}
           <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 border-b border-slate-100 rounded-t-xl mb-2">
             <div className="col-span-4 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
               Ingredient Name
@@ -226,10 +153,10 @@ const Ingredients = () => {
             </div>
           </div>
 
-          {/* Data Rows */}
           <div className="space-y-1 px-2">
             {ingredients.map((ingredient) => {
-              const isLowStock = Number(ingredient.current_stock) <= Number(ingredient.alert_threshold);
+              const isLowStock =
+                Number(ingredient.current_stock) <= Number(ingredient.alert_threshold);
 
               return (
                 <div
@@ -240,8 +167,6 @@ const Ingredients = () => {
                       : 'bg-white hover:bg-slate-50'
                   }`}
                 >
-                  {/* Left-side red border for low stock is handled by the border-l-4 class above */}
-
                   <div className="col-span-4 flex items-center gap-3">
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -265,6 +190,10 @@ const Ingredients = () => {
                           </span>
                         )}
                       </div>
+                      {/* Badge pentru Categorie adăugat aici */}
+                      <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        {ingredient.category}
+                      </span>
                     </div>
                   </div>
 
@@ -297,7 +226,6 @@ const Ingredients = () => {
               );
             })}
 
-            {/* Mesaj când nu există ingrediente */}
             {ingredients.length === 0 && (
               <div className="text-center py-8 text-slate-500 font-medium">
                 No ingredients found. Click "Add New Ingredient" to start!
@@ -306,6 +234,198 @@ const Ingredients = () => {
           </div>
         </div>
       </div>
+
+      {/* MODAL OVERLAY - Se randează doar dacă showForm este true */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-6 animate-fade-in">
+          {/* Modal Container */}
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-slate-200">
+            {/* Modal Header */}
+            <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <div>
+                <h2 className="font-manrope text-2xl font-bold text-slate-900">
+                  Add New Ingredient
+                </h2>
+                <p className="font-body text-sm text-slate-500 mt-1">
+                  Enter the details for the new inventory item.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-slate-400 hover:text-orange-600 transition-colors p-2 rounded-full hover:bg-orange-50 focus:outline-none"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-8 py-6 flex-1 overflow-y-auto">
+              <form id="addIngredientForm" onSubmit={handleSubmit} className="space-y-6">
+                {/* Ingredient Name */}
+                <div>
+                  <label
+                    className="block font-body text-sm font-semibold text-slate-700 mb-2"
+                    htmlFor="name"
+                  >
+                    Ingredient Name
+                  </label>
+                  <input
+                    required
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="e.g., Organic Carrots"
+                    type="text"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-slate-900 font-body text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Category Dropdown */}
+                  <div>
+                    <label
+                      className="block font-body text-sm font-semibold text-slate-700 mb-2"
+                      htmlFor="category"
+                    >
+                      Category
+                    </label>
+                    <div className="relative">
+                      <select
+                        required
+                        id="category"
+                        name="category"
+                        value={formData.category}
+                        onChange={handleInputChange}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pl-4 pr-10 text-slate-900 font-body text-sm appearance-none focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all cursor-pointer"
+                      >
+                        <option disabled value="">
+                          Select category
+                        </option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Meat & Poultry">Meat & Poultry</option>
+                        <option value="Dairy & Eggs">Dairy & Eggs</option>
+                        <option value="Dry Goods">Dry Goods</option>
+                        <option value="Spices & Herbs">Spices & Herbs</option>
+                        <option value="Liquids">Liquids</option>
+                        <option value="General">General</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                        <span className="material-symbols-outlined">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Unit of Measure Dropdown */}
+                  <div>
+                    <label
+                      className="block font-body text-sm font-semibold text-slate-700 mb-2"
+                      htmlFor="unit_of_measure"
+                    >
+                      Unit of Measure
+                    </label>
+                    <div className="relative">
+                      <select
+                        required
+                        id="unit_of_measure"
+                        name="unit_of_measure"
+                        value={formData.unit_of_measure}
+                        onChange={handleInputChange}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pl-4 pr-10 text-slate-900 font-body text-sm appearance-none focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all cursor-pointer"
+                      >
+                        <option disabled value="">
+                          Select unit
+                        </option>
+                        <option value="kg">kg (Kilograms)</option>
+                        <option value="g">g (Grams)</option>
+                        <option value="L">L (Liters)</option>
+                        <option value="ml">ml (Milliliters)</option>
+                        <option value="units">Units / Pieces</option>
+                        <option value="bunch">Bunch</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                        <span className="material-symbols-outlined">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Current Stock */}
+                  <div>
+                    <label
+                      className="block font-body text-sm font-semibold text-slate-700 mb-2"
+                      htmlFor="current_stock"
+                    >
+                      Current Stock
+                    </label>
+                    <input
+                      required
+                      id="current_stock"
+                      name="current_stock"
+                      value={formData.current_stock}
+                      onChange={handleInputChange}
+                      min="0"
+                      placeholder="0.00"
+                      step="0.01"
+                      type="number"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-slate-900 font-body text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all"
+                    />
+                  </div>
+
+                  {/* Alert Threshold */}
+                  <div>
+                    <label
+                      className="block font-body text-sm font-semibold text-slate-700 mb-2"
+                      htmlFor="alert_threshold"
+                    >
+                      Alert Threshold{' '}
+                      <span className="text-slate-400 font-normal text-xs ml-1">(Warning)</span>
+                    </label>
+                    <input
+                      required
+                      id="alert_threshold"
+                      name="alert_threshold"
+                      value={formData.alert_threshold}
+                      onChange={handleInputChange}
+                      min="0"
+                      placeholder="0.00"
+                      step="0.01"
+                      type="number"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-slate-900 font-body text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-8 py-5 bg-slate-50 flex justify-end items-center gap-4 border-t border-slate-100 rounded-b-2xl">
+              <button
+                onClick={() => setShowForm(false)}
+                className="px-6 py-2.5 font-body text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors focus:outline-none"
+                type="button"
+              >
+                Cancel
+              </button>
+              {/* Butonul e legat de form prin atributul form="addIngredientForm" */}
+              <button
+                form="addIngredientForm"
+                type="submit"
+                className="px-6 py-2.5 bg-gradient-to-b from-orange-600 to-orange-700 text-white font-body text-sm font-bold rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all shadow-sm focus:outline-none flex items-center gap-2"
+              >
+                <span
+                  className="material-symbols-outlined text-[18px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  add
+                </span>
+                Add Ingredient
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

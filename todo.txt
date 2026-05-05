@@ -1,3 +1,5 @@
-sa termin filtrele de categorii pe frontend
+INGREDIENTE
+iconite ingrediente
+edit ingrediente
 
 sa am istorc in fiecare zi pe supiera cate ciorbe si ce ciorbe au fost in supiera respectiva

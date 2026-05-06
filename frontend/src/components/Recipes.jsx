@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getRecipes, addRecipe, deleteRecipe } from '../services/recipeService';
+import { getRecipes, addRecipe, deleteRecipe, updateRecipe } from '../services/recipeService';
 import { getIngredients } from '../services/ingredientsService';
 
 const Recipes = () => {
@@ -7,11 +7,13 @@ const Recipes = () => {
   const [availableIngredients, setAvailableIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // State pentru a ști ce rețetă vizualizăm (null = suntem în modul Creare)
+  // State pentru a ști ce rețetă vizualizăm
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  // State pentru a ști ce rețetă edităm
+  const [editingRecipeId, setEditingRecipeId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // State pentru formularul de Creare
+  // State pentru formularul de Creare/Editare
   const [recipeName, setRecipeName] = useState('');
   const [recipeDescription, setRecipeDescription] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
@@ -34,7 +36,6 @@ const Recipes = () => {
     loadData();
   }, []);
 
-  // Adăugare ingredient în lista de "Draft" (pentru rețetă nouă)
   const handleAddIngredientToRecipe = (e) => {
     e.preventDefault();
     if (!currentIngredientId || !currentQuantity) return;
@@ -65,6 +66,14 @@ const Recipes = () => {
     setSelectedIngredients(selectedIngredients.filter((item) => item.ingredient_id !== id));
   };
 
+  const handleEditClick = () => {
+    setRecipeName(selectedRecipe.name);
+    setRecipeDescription(selectedRecipe.description || '');
+    setSelectedIngredients(selectedRecipe.ingredients);
+    setEditingRecipeId(selectedRecipe.id);
+    setSelectedRecipe(null); // Ieșim din modul "Read-Only" și intrăm în Configurator
+  };
+
   const handleSubmitRecipe = async (e) => {
     e.preventDefault();
     if (selectedIngredients.length === 0) {
@@ -72,15 +81,23 @@ const Recipes = () => {
       return;
     }
     try {
-      await addRecipe({
+      const recipePayload = {
         name: recipeName,
         description: recipeDescription,
         ingredients: selectedIngredients,
-      });
+      };
+
+      if (editingRecipeId) {
+        await updateRecipe(editingRecipeId, recipePayload);
+      } else {
+        await addRecipe(recipePayload);
+      }
+
       // Resetăm formularul
       setRecipeName('');
       setRecipeDescription('');
       setSelectedIngredients([]);
+      setEditingRecipeId(null);
       loadData();
     } catch (error) {
       alert(error.message);
@@ -92,12 +109,20 @@ const Recipes = () => {
     try {
       await deleteRecipe(id);
       if (selectedRecipe && selectedRecipe.id === id) {
-        setSelectedRecipe(null); // Ieșim din modul view dacă rețeta a fost ștearsă
+        setSelectedRecipe(null);
       }
       loadData();
     } catch (error) {
       alert(error.message);
     }
+  };
+
+  const handleSelectRecipe = (recipe) => {
+    setSelectedRecipe(recipe);
+    setEditingRecipeId(null);
+    setRecipeName('');
+    setRecipeDescription('');
+    setSelectedIngredients([]);
   };
 
   const filteredRecipes = recipes.filter((r) =>
@@ -115,7 +140,7 @@ const Recipes = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-manrope text-2xl font-bold text-slate-900">Recipe Vault</h2>
             <button
-              onClick={() => setSelectedRecipe(null)}
+              onClick={() => handleSelectRecipe(null)}
               className="w-8 h-8 flex items-center justify-center bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
               title="Create New Recipe"
             >
@@ -142,7 +167,7 @@ const Recipes = () => {
             return (
               <button
                 key={recipe.id}
-                onClick={() => setSelectedRecipe(recipe)}
+                onClick={() => handleSelectRecipe(recipe)}
                 className={`w-full text-left rounded-lg p-4 transition-all flex flex-col gap-1 relative overflow-hidden group border ${
                   isActive
                     ? 'bg-white shadow-md border-slate-200'
@@ -156,11 +181,11 @@ const Recipes = () => {
                   <span
                     className={`font-manrope font-bold text-base ${
                       isActive ? 'text-slate-900' : 'text-slate-700'
-                    }`}
+                    } truncate pr-2`}
                   >
                     {recipe.name}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full uppercase">
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full uppercase shrink-0">
                     {recipe.ingredients.length} Ing
                   </span>
                 </div>
@@ -180,20 +205,25 @@ const Recipes = () => {
 
       {/* RIGHT PANEL: Detail / Configuration */}
       <section className="w-full lg:w-2/3 xl:w-3/4 flex flex-col gap-6 h-full overflow-y-auto pb-10 scrollbar-hide pr-2">
-        {/* Header Card */}
+        {/* Header Card cu fix pentru overflow */}
         <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 relative overflow-hidden flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="flex flex-col gap-2 relative z-10 w-full">
+          {/* Wrapper flexibil min-w-0 previne overflow-ul input-urilor lungi */}
+          <div className="flex flex-col gap-2 relative z-10 flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-1">
               <span className="text-xs font-bold tracking-wider uppercase text-orange-700 bg-orange-100 px-2.5 py-1 rounded-sm">
-                {selectedRecipe ? 'Active Recipe' : 'New Draft'}
+                {selectedRecipe
+                  ? 'Active Recipe'
+                  : editingRecipeId
+                  ? 'Editing Recipe'
+                  : 'New Draft'}
               </span>
             </div>
 
             {selectedRecipe ? (
               <>
-                <h1 className="font-manrope text-4xl font-extrabold text-slate-900 tracking-tight">
+                <h1 className="font-manrope text-4xl font-extrabold text-slate-900 tracking-tight break-words">
                   {selectedRecipe.name}
                 </h1>
                 <p className="text-slate-600 text-sm mt-1 max-w-xl">
@@ -202,23 +232,37 @@ const Recipes = () => {
               </>
             ) : (
               <>
+                {/* Truncate pentru a ascunde textul lung ce depășește lățimea */}
                 <input
                   type="text"
                   value={recipeName}
                   onChange={(e) => setRecipeName(e.target.value)}
                   placeholder="Enter Recipe Name..."
-                  className="font-manrope text-4xl font-extrabold text-slate-900 tracking-tight bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-300 outline-none w-full"
+                  className="font-manrope text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-300 outline-none w-full truncate"
                 />
-                <input
-                  type="text"
+                {/* Textarea în loc de input pentru a forța textul lung pe mai multe rânduri */}
+                <textarea
+                  rows="2"
                   value={recipeDescription}
                   onChange={(e) => setRecipeDescription(e.target.value)}
                   placeholder="Add a brief description..."
-                  className="text-slate-600 text-sm mt-1 max-w-xl bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-400 outline-none w-full"
+                  className="text-slate-600 text-sm mt-1 max-w-xl bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-400 outline-none w-full resize-none"
                 />
               </>
             )}
           </div>
+
+          {/* Butonul Edit Recipe este shrink-0 pentru a nu fi redus de flexbox */}
+          {selectedRecipe && (
+            <div className="flex gap-3 relative z-10 mt-4 sm:mt-0 shrink-0">
+              <button
+                onClick={handleEditClick}
+                className="bg-gradient-to-b from-orange-600 to-orange-700 text-white px-6 py-2 rounded-md font-semibold text-sm shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2 whitespace-nowrap"
+              >
+                <span className="material-symbols-outlined text-[18px]">edit</span> Edit Recipe
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Main Configuration Area */}
@@ -229,6 +273,9 @@ const Recipes = () => {
               <h3 className="font-manrope text-xl font-bold text-slate-900">
                 Standard Batch Ingredients
               </h3>
+              <span className="text-xs font-bold text-orange-700 bg-orange-100 px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">
+                Yield: 10 Stockpots
+              </span>
             </div>
 
             {/* Table Headers */}
@@ -241,7 +288,6 @@ const Recipes = () => {
 
             {/* Table Body */}
             <div className="flex flex-col border-b border-slate-100">
-              {/* Afișăm ingredientele salvate (dacă suntem în View Mode) sau draft-ul (dacă suntem în Create Mode) */}
               {(selectedRecipe ? selectedRecipe.ingredients : selectedIngredients).map(
                 (ing, index) => (
                   <div
@@ -281,7 +327,7 @@ const Recipes = () => {
               )}
             </div>
 
-            {/* Add Ingredient Input (DOAR ÎN CREATE MODE) */}
+            {/* Add Ingredient Input (DOAR ÎN CREATE/EDIT MODE) */}
             {!selectedRecipe && (
               <div className="mt-8 pt-6 relative border-t border-slate-100">
                 <label className="text-xs font-bold text-slate-500 mb-2 block uppercase tracking-wider">
@@ -373,7 +419,7 @@ const Recipes = () => {
                       <span className="text-slate-500">Status</span>
                       <span className="font-bold text-orange-600 flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>{' '}
-                        Drafting
+                        {editingRecipeId ? 'Editing' : 'Drafting'}
                       </span>
                     </div>
                     <div className="h-px bg-slate-100 my-2"></div>
@@ -381,9 +427,18 @@ const Recipes = () => {
                       onClick={handleSubmitRecipe}
                       className="w-full bg-gradient-to-b from-orange-600 to-orange-700 text-white py-3 rounded-lg font-bold text-sm shadow-md hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
                     >
-                      <span className="material-symbols-outlined text-[18px]">save</span> Save
-                      Changes
+                      <span className="material-symbols-outlined text-[18px]">save</span>
+                      {editingRecipeId ? 'Update Recipe' : 'Save Changes'}
                     </button>
+                    {/* Buton de Cancel Edit */}
+                    {editingRecipeId && (
+                      <button
+                        onClick={() => handleSelectRecipe(null)}
+                        className="w-full bg-slate-100 text-slate-600 hover:bg-slate-200 py-3 rounded-lg font-bold text-sm transition-colors mt-2"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
                   </>
                 )}
               </div>

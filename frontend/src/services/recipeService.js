@@ -29,3 +29,13 @@ export const deleteRecipe = async (id) => {
   if (!response.ok) throw new Error('Failed to delete recipe');
   return await response.json();
 };
+
+export const updateRecipe = async (id, recipeData) => {
+  const response = await fetch(`${baseUrl}/api/recipes/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(recipeData),
+  });
+  if (!response.ok) throw new Error('Failed to update recipe');
+  return await response.json();
+};

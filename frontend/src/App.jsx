@@ -78,9 +78,7 @@ function AppContent({ user, onLogout }) {
         {/* HEADER GLOBAL */}
         <header className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-sm flex items-center justify-between px-8 h-16 font-manrope font-medium text-sm">
           <div className="flex items-center gap-6">
-            <div className="hidden md:block text-lg font-black text-slate-900">
-              StockPot Workspace
-            </div>
+            <div className="hidden md:block text-lg font-black text-slate-900">ce sa pun aici</div>
           </div>
 
           {/* Zona din dreapta cu profilul și logout */}

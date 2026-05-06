@@ -91,4 +91,51 @@ const deleteRecipe = async (req, res) => {
   }
 };
 
-export { addRecipe, getRecipes, deleteRecipe };
+const updateRecipe = async (req, res) => {
+  const { id } = req.params;
+  const { name, description, ingredients } = req.body;
+
+  if (!name || !ingredients || ingredients.length === 0) {
+    return res.status(400).json({ error: 'Recipe name and at least one ingredient are required!' });
+  }
+
+  try {
+    await db.query('BEGIN');
+
+    const recipeResult = await db.query(
+      `UPDATE Recipe 
+       SET name = $1, description = $2 
+       WHERE id = $3 
+       RETURNING *`,
+      [name, description, id]
+    );
+
+    if (recipeResult.rowCount === 0) {
+      await db.query('ROLLBACK');
+      return res.status(404).json({ error: 'Recipe not found!' });
+    }
+
+    await db.query(`DELETE FROM Recipe_Ingredient WHERE recipe_id = $1`, [id]);
+
+    for (const ing of ingredients) {
+      await db.query(
+        `INSERT INTO Recipe_Ingredient (recipe_id, ingredient_id, quantity_required) 
+         VALUES ($1, $2, $3)`,
+        [id, ing.ingredient_id, ing.quantity_required]
+      );
+    }
+
+    await db.query('COMMIT');
+
+    res.status(200).json({
+      message: 'Recipe updated successfully!',
+      updatedRecipe: recipeResult.rows[0],
+    });
+  } catch (error) {
+    await db.query('ROLLBACK');
+    console.error('Error updating recipe:', error);
+    res.status(500).json({ error: 'Internal server error while updating recipe.' });
+  }
+};
+
+export { addRecipe, getRecipes, deleteRecipe, updateRecipe };

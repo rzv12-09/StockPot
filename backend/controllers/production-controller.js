@@ -42,6 +42,9 @@ export const createProductionBatch = async (req, res) => {
       ]);
     }
 
+    const STOCKPOTS_PER_BATCH = 10;
+    const totalStockpotsProduced = quantity_produced * STOCKPOTS_PER_BATCH;
+
     const upsertStockQuery = `
       INSERT INTO finished_soups (recipe_id, current_quantity)
       VALUES ($1, $2)
@@ -50,7 +53,7 @@ export const createProductionBatch = async (req, res) => {
         current_quantity = finished_soups.current_quantity + $2,
         last_updated = CURRENT_TIMESTAMP
     `;
-    await client.query(upsertStockQuery, [recipe_id, quantity_produced]);
+    await client.query(upsertStockQuery, [recipe_id, totalStockpotsProduced]);
 
     const logBatchQuery = `
       INSERT INTO Production_Batches (recipe_id, user_id, quantity_produced)
@@ -60,7 +63,7 @@ export const createProductionBatch = async (req, res) => {
     const { rows: batchRecord } = await client.query(logBatchQuery, [
       recipe_id,
       user_id,
-      quantity_produced,
+      totalStockpotsProduced,
     ]);
 
     await client.query('COMMIT');
@@ -70,7 +73,7 @@ export const createProductionBatch = async (req, res) => {
       details: {
         batch_id: batchRecord[0].id,
         recipe_id,
-        quantity_added: quantity_produced,
+        quantity_added: totalStockpotsProduced,
         timestamp: batchRecord[0].production_date,
       },
     });

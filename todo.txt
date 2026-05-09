@@ -2,6 +2,8 @@ INGREDIENTE
 iconite ingrediente
 sa adaug notitie pentru bucatar la retete
 sa fac modulul pentru manager
+sa adaug buton de reinventariere ciorbe
+cand apas pe o ciorba in cold storage sa se extinda cu totate batchurile de productie
 sa pot sa fac refill la o ciorba in aceeasi supiera
 sa adaug buton de restrangere sidebar
 sa am istorc in fiecare zi pe supiera cate ciorbe si ce ciorbe au fost in supiera respectiva

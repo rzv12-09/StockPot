@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getRecipes } from '../services/recipeService';
-import {
-  getCookedStock,
-  createProductionBatch,
-  getProductionPreview,
-} from '../services/productionService';
+import { createProductionBatch, getProductionPreview } from '../services/productionService';
 
 const Production = () => {
   const [recipes, setRecipes] = useState([]);
-  const [stock, setStock] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState('');
   const [quantity, setQuantity] = useState(1);
 
@@ -21,7 +16,7 @@ const Production = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // 1. Încărcarea inițială (Rețete și Frigider)
+  // 1. Încărcarea inițială (Doar Rețete)
   useEffect(() => {
     fetchData();
   }, []);
@@ -29,12 +24,10 @@ const Production = () => {
   const fetchData = async () => {
     try {
       const recipesData = await getRecipes();
-      const stockData = await getCookedStock();
       setRecipes(recipesData);
-      setStock(stockData);
       if (recipesData.length > 0) setSelectedRecipe(recipesData[0].id);
     } catch (err) {
-      setError('Failed to load data.' + err);
+      setError('Failed to load data. ' + err.message);
     }
   };
 
@@ -76,7 +69,6 @@ const Production = () => {
       // Confirmare vizuală pentru câte marmite au ajuns efectiv în frigider
       setSuccess(`Production batch recorded! Added ${quantity * 10} marmites to inventory.`);
       setQuantity(1); // Resetăm cantitatea
-      fetchData(); // Reîncărcăm frigiderul
     } catch (err) {
       setError(err.message);
     } finally {
@@ -86,7 +78,7 @@ const Production = () => {
 
   return (
     <div className="flex-1 relative">
-      {/* Header Pagină - Stil Ingredients.jsx */}
+      {/* Header Pagină */}
       <div className="mb-8">
         <h2 className="font-manrope text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
           Daily Production
@@ -240,7 +232,7 @@ const Production = () => {
               )}
             </div>
 
-            {/* Mesaj de eroare stoc - stil consistent */}
+            {/* Mesaj de eroare stoc */}
             {!canProduce && !isPreviewLoading && previewData.length > 0 && (
               <div className="mb-4 bg-red-50 text-red-600 text-xs font-medium p-3 rounded-lg border border-red-100 flex items-center gap-2">
                 <span className="material-symbols-outlined text-[16px]">warning</span>
@@ -271,61 +263,6 @@ const Production = () => {
               </p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* CAMERA FRIGORIFICĂ - Container stil tabel Ingredients */}
-      <div>
-        <h2 className="font-manrope text-2xl font-extrabold text-slate-900 tracking-tight mb-6 flex items-center gap-3">
-          <span className="material-symbols-outlined text-sky-600 text-[26px]">ac_unit</span>
-          Cold Room Stock
-        </h2>
-        <div className="bg-white border border-slate-100 shadow-sm rounded-xl overflow-hidden pb-1">
-          <table className="min-w-full divide-y divide-slate-100">
-            {/* Header Tabel - Stil identic Ingredients */}
-            <thead className="bg-slate-50/50">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider font-manrope">
-                  Recipe Name
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider font-manrope">
-                  Quantity Available
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider font-manrope">
-                  Last Updated
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-slate-100/70 font-body text-sm">
-              {stock.length === 0 ? (
-                <tr>
-                  <td colSpan="3" className="px-6 py-10 text-center text-slate-400 font-medium">
-                    No cooked batches in the fridge yet.
-                  </td>
-                </tr>
-              ) : (
-                stock.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap font-semibold text-slate-800">
-                      {item.recipe_name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {/* Badge similar Ingredients */}
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 text-sky-700 font-bold text-sm">
-                        <span className="material-symbols-outlined text-[16px] text-sky-500">
-                          soup_kitchen
-                        </span>
-                        {item.current_quantity} {item.unit_of_measure || 'Marmites'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-500 font-medium">
-                      {new Date(item.last_updated).toLocaleString()}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

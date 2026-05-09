@@ -20,267 +20,122 @@ const SoupInventory = () => {
     }
   };
 
-  // 1. Calculăm cantitatea totală de mâncare din frigider
+  // Calculăm volumul total
   const totalQuantity = stock.reduce((sum, item) => sum + Number(item.current_quantity), 0);
-
-  // 2. Funcție inteligentă pentru calcularea prospețimii (pe baza orei gătirii)
-  const getFreshness = (dateString) => {
-    const hoursOld = (new Date() - new Date(dateString)) / (1000 * 60 * 60);
-
-    if (hoursOld > 48) {
-      return {
-        status: 'Critical',
-        barColor: 'bg-red-500',
-        textColor: 'text-red-600',
-        width: '90%',
-        alert: true,
-      };
-    }
-    if (hoursOld > 24) {
-      return {
-        status: 'Good',
-        barColor: 'bg-amber-500',
-        textColor: 'text-amber-600',
-        width: '50%',
-        alert: false,
-      };
-    }
-    return {
-      status: 'Optimal',
-      barColor: 'bg-teal-500',
-      textColor: 'text-teal-600',
-      width: '15%',
-      alert: false,
-    };
-  };
-
-  // Numărăm câte batch-uri sunt "Critice"
-  const criticalBatches = stock.filter((item) => getFreshness(item.last_updated).alert).length;
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-full text-orange-600">
+      <div className="flex justify-center items-center h-full text-orange-600 py-20">
         <span className="material-symbols-outlined animate-spin text-4xl">refresh</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-12 max-w-7xl mx-auto">
-      {/* Page Header */}
-      <div className="flex justify-between items-end">
+    <div className="flex-1 relative">
+      {/* Page Header & Key Metrics */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-6">
         <div>
-          <h2 className="font-manrope text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            Cold Storage Inventory
-          </h2>
-          <p className="font-body text-slate-500 text-lg">
-            Real-time monitoring of finished soup batches in main fridge.
+          <p className="text-sm font-body font-bold text-orange-600 uppercase tracking-wider mb-1">
+            Cold Storage
           </p>
+          <h2 className="text-4xl font-manrope font-extrabold text-slate-900 tracking-tight">
+            Soup Inventory
+          </h2>
         </div>
-        {/* Filters */}
-        <div className="flex gap-3">
-          <button className="bg-white border border-slate-200 px-4 py-2 rounded-full text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm">
-            <span className="material-symbols-outlined text-lg text-orange-600">filter_list</span>
-            All Soups
-          </button>
+
+        {/* Metrica Principală */}
+        <div className="flex gap-4 flex-wrap">
+          <div className="bg-white px-6 py-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-5">
+            <div className="h-12 w-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+              <span
+                className="material-symbols-outlined text-[28px]"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                water_drop
+              </span>
+            </div>
+            <div>
+              <p className="text-sm font-body text-slate-500 font-bold uppercase tracking-wider mb-0.5">
+                Total Volume
+              </p>
+              <p className="text-3xl font-manrope font-black text-slate-900 leading-none">
+                {totalQuantity}{' '}
+                <span className="text-lg text-slate-400 font-bold ml-0.5">Marmites</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Bento Summary Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Total Quantity */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute -right-6 -top-6 w-32 h-32 bg-orange-500/5 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
-          <div className="flex justify-between items-start mb-6 z-10">
-            <h3 className="font-manrope text-lg font-bold text-slate-900">Total Finished Volume</h3>
-            <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
-              <span className="material-symbols-outlined">water_drop</span>
+      {/* Secțiunea Principală - Tabelul */}
+      <div className="flex flex-col gap-6">
+        {/* Batch Data Table */}
+        <div className="bg-white rounded-xl p-2 shadow-sm border border-slate-200">
+          <div className="w-full text-left font-body">
+            {/* Header Row */}
+            <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 rounded-lg text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 font-manrope">
+              <div className="col-span-2">Batch ID</div>
+              <div className="col-span-4">Soup Name</div>
+              <div className="col-span-3">Prod. Date</div>
+              <div className="col-span-1 text-right">Volume</div>
+              <div className="col-span-2 text-right">Action</div>
             </div>
-          </div>
-          <div className="z-10">
-            <div className="flex items-baseline gap-2">
-              <span className="font-manrope text-5xl font-black text-slate-900 tracking-tighter">
-                {totalQuantity}
-              </span>
-              <span className="font-body text-slate-500 font-medium">Units</span>
-            </div>
-            <p className="font-body text-sm text-teal-600 mt-2 flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm">trending_up</span>
-              Live data from database
-            </p>
-          </div>
-        </div>
 
-        {/* Expiry Warning */}
-        <div
-          className={`bg-white rounded-xl p-6 shadow-sm border-l-4 ${
-            criticalBatches > 0 ? 'border-red-500' : 'border-green-500'
-          } flex flex-col justify-between relative overflow-hidden`}
-        >
-          <div className="flex justify-between items-start mb-6">
-            <h3 className="font-manrope text-lg font-bold text-slate-900">Batches Near Expiry</h3>
-            <div
-              className={`p-2 rounded-lg ${
-                criticalBatches > 0 ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
-              }`}
-            >
-              <span className="material-symbols-outlined">warning</span>
-            </div>
-          </div>
-          <div>
-            <div className="flex items-baseline gap-2">
-              <span
-                className={`font-manrope text-5xl font-black tracking-tighter ${
-                  criticalBatches > 0 ? 'text-red-600' : 'text-green-600'
-                }`}
-              >
-                {criticalBatches}
-              </span>
-              <span className="font-body text-slate-500 font-medium">Batches</span>
-            </div>
-            <p className="font-body text-sm text-slate-500 mt-2">
-              {criticalBatches > 0
-                ? 'Require immediate action!'
-                : 'All batches are perfectly fresh.'}
-            </p>
-          </div>
-        </div>
+            {/* Data Rows */}
+            <div className="flex flex-col gap-1">
+              {stock.length === 0 ? (
+                <div className="py-12 text-center text-slate-500 font-medium">
+                  The cold room is empty. Go to Production to cook some batches!
+                </div>
+              ) : (
+                stock.map((item, index) => {
+                  const isEven = index % 2 === 0;
 
-        {/* Fridge Temp (Simulated) */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute -left-6 -bottom-6 w-32 h-32 bg-teal-500/5 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
-          <div className="flex justify-between items-start mb-6 z-10">
-            <h3 className="font-manrope text-lg font-bold text-slate-900">Fridge Temp</h3>
-            <div className="p-2 bg-teal-50 rounded-lg text-teal-600">
-              <span className="material-symbols-outlined">ac_unit</span>
-            </div>
-          </div>
-          <div className="z-10 flex items-center justify-between">
-            <div>
-              <div className="flex items-baseline gap-1">
-                <span className="font-manrope text-5xl font-black text-teal-600 tracking-tighter">
-                  2.4
-                </span>
-                <span className="font-manrope text-2xl font-bold text-teal-600">°C</span>
-              </div>
-              <p className="font-body text-sm text-slate-500 mt-2 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-teal-500 inline-block"></span> Optimal Zone
-              </p>
-            </div>
-            <div className="h-16 w-4 bg-slate-100 rounded-full overflow-hidden flex flex-col justify-end border border-slate-200">
-              <div className="w-full bg-teal-500 h-3/4 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-      </section>
+                  return (
+                    <div
+                      key={item.id}
+                      className={`grid grid-cols-12 gap-4 px-6 py-4 items-center rounded-lg transition-colors group ${
+                        isEven ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/50 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="col-span-2 font-manrope font-bold text-slate-900">
+                        B-{item.id.toString().padStart(4, '0')}
+                      </div>
 
-      {/* Inventory Grid */}
-      <section>
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="font-manrope text-2xl font-bold text-slate-900">Active Batches</h3>
-          <div className="text-sm font-medium text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">
-            {stock.length} Batches Logged
-          </div>
-        </div>
+                      <div className="col-span-4 font-semibold text-slate-800 truncate pr-2">
+                        {item.recipe_name}
+                      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {stock.length === 0 ? (
-            <p className="col-span-full text-center py-10 text-slate-500">
-              The cold room is empty.
-            </p>
-          ) : (
-            stock.map((item) => {
-              const freshness = getFreshness(item.last_updated);
+                      <div className="col-span-3 text-slate-500 text-sm font-medium">
+                        {new Date(item.last_updated).toLocaleString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </div>
 
-              // Folosim o imagine default de tip "placeholder" estetică
-              const imageUrl = `https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=500&q=80`;
+                      <div className="col-span-1 text-right font-manrope font-extrabold text-orange-600 text-lg">
+                        {item.current_quantity}
+                      </div>
 
-              return (
-                <article
-                  key={item.id}
-                  className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col transition-transform hover:-translate-y-1 duration-300 relative group"
-                >
-                  {/* Warning Badge (Dacă e nevoie) */}
-                  {freshness.alert && (
-                    <div className="absolute top-4 right-4 z-20 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px]">timer</span> Urgent
-                    </div>
-                  )}
-
-                  <div className="h-48 relative overflow-hidden">
-                    <img
-                      src={imageUrl}
-                      alt={item.recipe_name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 z-10 flex gap-2">
-                      <span className="bg-white/20 backdrop-blur-md text-white text-xs font-bold px-2 py-1 rounded-md border border-white/30">
-                        #{item.id}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-6 flex-1 flex flex-col">
-                    <h4 className="font-manrope text-xl font-bold text-slate-900 mb-1">
-                      {item.recipe_name}
-                    </h4>
-                    <p className="font-body text-sm text-slate-500 mb-6">
-                      Produced:{' '}
-                      {new Date(item.last_updated).toLocaleString(undefined, {
-                        weekday: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
-
-                    {/* Volume & Freshness Card */}
-                    <div className="mb-6 bg-slate-50 rounded-lg p-4 border border-slate-100">
-                      <div className="flex justify-between items-baseline mb-2">
-                        <span className="text-sm text-slate-700 font-semibold">
-                          Volume Remaining
-                        </span>
-                        <span className="font-manrope font-bold text-orange-600 text-lg">
-                          {item.current_quantity}{' '}
-                          <span className="text-slate-400 text-sm font-medium">
-                            {item.unit_of_measure}
+                      <div className="col-span-2 text-right">
+                        <button className="opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 hover:bg-orange-100 hover:text-orange-700 text-slate-600 text-xs font-bold px-4 py-2 rounded-lg flex items-center justify-end gap-1 ml-auto">
+                          Move to Service
+                          <span className="material-symbols-outlined text-[14px]">
+                            arrow_forward
                           </span>
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between items-baseline mb-2 mt-4">
-                        <span className="text-sm text-slate-700 font-semibold">
-                          Freshness Status
-                        </span>
-                        <span className={`text-xs font-bold ${freshness.textColor}`}>
-                          {freshness.status}
-                        </span>
-                      </div>
-                      {/* Freshness Bar */}
-                      <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${freshness.barColor}`}
-                          style={{ width: freshness.width }}
-                        ></div>
+                        </button>
                       </div>
                     </div>
-
-                    {/* Buttons */}
-                    <div className="mt-auto flex gap-3 pt-4 border-t border-slate-100">
-                      <button className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold py-2 rounded-md transition-colors text-center shadow-sm">
-                        Log Service
-                      </button>
-                      <button className="flex-1 bg-transparent border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-sm font-semibold py-2 rounded-md transition-colors text-center">
-                        Dispose
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })
-          )}
+                  );
+                })
+              )}
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

@@ -16,17 +16,6 @@ import {
   Legend,
 } from 'recharts';
 
-// Date mock pentru graficele temporale (până adăugăm logica pe zile în DB)
-const weeklyData = [
-  { name: 'Mon', volume: 120 },
-  { name: 'Tue', volume: 180 },
-  { name: 'Wed', volume: 250 },
-  { name: 'Thu', volume: 190 },
-  { name: 'Fri', volume: 320 },
-  { name: 'Sat', volume: 450 },
-  { name: 'Sun', volume: 280 },
-];
-
 const topIngredientsMock = [
   { name: 'Onions', use: 95 },
   { name: 'Carrots', use: 80 },
@@ -174,7 +163,10 @@ const Analytics = () => {
           </div>
           <div className="flex-1 w-full h-full min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart
+                data={charts.weeklyVolume}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
                 <defs>
                   <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#ea580c" stopOpacity={0.3} />

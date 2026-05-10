@@ -8,3 +8,5 @@ cand apas pe o ciorba in cold storage sa se extinda cu totate batchurile de prod
 sa pot sa fac refill la o ciorba in aceeasi supiera
 sa adaug buton de restrangere sidebar
 sa am istorc in fiecare zi pe supiera cate ciorbe si ce ciorbe au fost in supiera respectiva
+sa pot sa vad monthly production volume si sa vad si pe fiecare ciorba in parte
+grafic cu consumul de ciorba saptamanal (total si pe fiecare ciorba in parte)

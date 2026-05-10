@@ -17,7 +17,7 @@ export const getDashboardStats = async (req, res) => {
       `SELECT COUNT(*) as count FROM Ingredient`
     );
 
-    // 4. Distribuția pe Categorii (Pentru Graficul tip Gogoașă / Doughnut)
+    // 4. Distribuția pe Categorii
     const { rows: categoryDistribution } = await db.query(
       `SELECT category as name, COUNT(*) as value 
        FROM Ingredient 
@@ -25,7 +25,7 @@ export const getDashboardStats = async (req, res) => {
        GROUP BY category`
     );
 
-    // 5. Top Rețete Performante (Din istoricul de producție)
+    // 5. Top Rețete Performante
     const { rows: topRecipes } = await db.query(
       `SELECT r.name, COUNT(pb.id) as frequency, SUM(pb.quantity_produced) as total_volume 
        FROM Production_Batches pb 
@@ -35,7 +35,7 @@ export const getDashboardStats = async (req, res) => {
        LIMIT 4`
     );
 
-    // 6. Ingrediente Care Necesită Atenție (Pentru "Stock Velocity / Heatmap")
+    // 6. Ingrediente Care Necesită Atenție
     const { rows: criticalStock } = await db.query(
       `SELECT name, current_stock, alert_threshold 
        FROM Ingredient 
@@ -44,18 +44,35 @@ export const getDashboardStats = async (req, res) => {
        LIMIT 4`
     );
 
+    // 7. NOU: Volumul de producție pe ultimele 7 zile
+    const { rows: weeklyVolume } = await db.query(`
+      WITH Last7Days AS (
+        SELECT (CURRENT_DATE - i) AS date_val
+        FROM generate_series(6, 0, -1) i
+      )
+      SELECT 
+        to_char(d.date_val, 'Dy') as name,
+        COALESCE(SUM(pb.quantity_produced), 0)::integer as volume
+      FROM Last7Days d
+      LEFT JOIN Production_Batches pb 
+        ON DATE(pb.production_date) = d.date_val
+      GROUP BY d.date_val
+      ORDER BY d.date_val;
+    `);
+
     // Trimitem totul ca un singur pachet JSON curat
     res.status(200).json({
       kpis: {
         lowStockAlerts: parseInt(lowStockRows[0].count, 10),
         activeMarmites: parseInt(activeMarmitesRows[0].total, 10),
         totalIngredients: parseInt(totalIngredientsRows[0].count, 10),
-        productionEfficiency: 94, // O lăsăm fixă momentan ca "Placeholder"
+        productionEfficiency: 94, // O lăsăm fixă momentan
       },
       charts: {
         categoryDistribution,
         topRecipes,
         criticalStock,
+        weeklyVolume, // Adăugăm datele noi aici!
       },
     });
   } catch (error) {

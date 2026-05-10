@@ -4,6 +4,7 @@ import recipeRouter from './recipe-router.js';
 import authRouter from './auth-router.js';
 import productionRouter from './production-router.js';
 import serviceRouter from './service-router.js';
+import analyticsRouter from './analytics-router.js';
 import userRouter from './user-router.js';
 import { authenticateToken } from '../middlewares/auth-middleware.js';
 
@@ -17,5 +18,6 @@ router.use('/recipes', recipeRouter);
 router.use('/production', productionRouter);
 router.use('/service', serviceRouter);
 router.use('/users', userRouter);
+router.use('/analytics', analyticsRouter);
 
 export default router;

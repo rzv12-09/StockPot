@@ -7,6 +7,7 @@ import Production from './components/Production';
 import SoupInventory from './components/SoupInventory';
 import ServiceTransfer from './components/ServiceTransfer';
 import UsersManagement from './components/UserManagement';
+import Analytics from './components/Analytics';
 
 // Componenta pentru butoanele din meniu (Acum știe dacă meniul e restrâns sau nu)
 const NavItem = ({ to, icon, label, isCollapsed }) => {
@@ -112,6 +113,7 @@ function AppContent({ user, onLogout }) {
           {isManager && (
             <NavItem to="/staff" icon="group" label="Staff" isCollapsed={isCollapsed} />
           )}
+          <NavItem to="/analytics" icon="analytics" label="Analytics" isCollapsed={isCollapsed} />
         </div>
       </nav>
 
@@ -184,6 +186,7 @@ function AppContent({ user, onLogout }) {
             <Route path="/transfer" element={<ServiceTransfer />} />
             {isManager && <Route path="/staff" element={<UsersManagement />} />}
             <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/analytics" element={<Analytics />} />
           </Routes>
         </main>
       </div>

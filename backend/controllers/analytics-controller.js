@@ -1,0 +1,65 @@
+import db from '../db.js';
+
+export const getDashboardStats = async (req, res) => {
+  try {
+    // 1. KPI: Low Stock Alerts Count
+    const { rows: lowStockRows } = await db.query(
+      `SELECT COUNT(*) as count FROM Ingredient WHERE current_stock <= alert_threshold`
+    );
+
+    // 2. KPI: Active Marmites in Cold Storage
+    const { rows: activeMarmitesRows } = await db.query(
+      `SELECT COALESCE(SUM(current_quantity), 0) as total FROM finished_soups`
+    );
+
+    // 3. KPI: Total Registered Ingredients
+    const { rows: totalIngredientsRows } = await db.query(
+      `SELECT COUNT(*) as count FROM Ingredient`
+    );
+
+    // 4. Distribuția pe Categorii (Pentru Graficul tip Gogoașă / Doughnut)
+    const { rows: categoryDistribution } = await db.query(
+      `SELECT category as name, COUNT(*) as value 
+       FROM Ingredient 
+       WHERE category IS NOT NULL 
+       GROUP BY category`
+    );
+
+    // 5. Top Rețete Performante (Din istoricul de producție)
+    const { rows: topRecipes } = await db.query(
+      `SELECT r.name, COUNT(pb.id) as frequency, SUM(pb.quantity_produced) as total_volume 
+       FROM Production_Batches pb 
+       JOIN Recipe r ON pb.recipe_id = r.id 
+       GROUP BY r.name 
+       ORDER BY total_volume DESC 
+       LIMIT 4`
+    );
+
+    // 6. Ingrediente Care Necesită Atenție (Pentru "Stock Velocity / Heatmap")
+    const { rows: criticalStock } = await db.query(
+      `SELECT name, current_stock, alert_threshold 
+       FROM Ingredient 
+       WHERE current_stock <= alert_threshold 
+       ORDER BY (current_stock / NULLIF(alert_threshold, 0)) ASC 
+       LIMIT 4`
+    );
+
+    // Trimitem totul ca un singur pachet JSON curat
+    res.status(200).json({
+      kpis: {
+        lowStockAlerts: parseInt(lowStockRows[0].count, 10),
+        activeMarmites: parseInt(activeMarmitesRows[0].total, 10),
+        totalIngredients: parseInt(totalIngredientsRows[0].count, 10),
+        productionEfficiency: 94, // O lăsăm fixă momentan ca "Placeholder"
+      },
+      charts: {
+        categoryDistribution,
+        topRecipes,
+        criticalStock,
+      },
+    });
+  } catch (error) {
+    console.error('Analytics Error:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics data' });
+  }
+};

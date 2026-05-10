@@ -4,6 +4,7 @@ sa adaug notitie pentru bucatar la retete
 sa fac modulul pentru manager
 sa adaug buton de reinventariere ciorbe
 search-bar la soup inventory dupa nume
+sa adaug soft delete pentru retele la ciorbe
 cand apas pe o ciorba in cold storage sa se extinda cu totate batchurile de productie
 sa pot sa fac refill la o ciorba in aceeasi supiera
 sa adaug buton de restrangere sidebar

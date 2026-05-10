@@ -16,14 +16,6 @@ import {
   Legend,
 } from 'recharts';
 
-const topIngredientsMock = [
-  { name: 'Onions', use: 95 },
-  { name: 'Carrots', use: 80 },
-  { name: 'Beef Stock', use: 65 },
-  { name: 'Potatoes', use: 50 },
-  { name: 'Cream', use: 40 },
-];
-
 const COLORS = ['#ea580c', '#f97316', '#fdba74', '#0f766e', '#14b8a6', '#99f6e4', '#64748b'];
 
 const Analytics = () => {
@@ -205,41 +197,57 @@ const Analytics = () => {
 
         {/* Small Charts */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          {/* Top Ingredients (Mock) */}
+          {/* Top Ingredients (Real DB Data) */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex-1">
             <h3 className="font-manrope text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">
               Top Ingredients Used
             </h3>
-            <div className="h-[150px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={topIngredientsMock}
-                  layout="vertical"
-                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                >
-                  <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" hide />
-                  <RechartsTooltip
-                    cursor={{ fill: '#f8fafc' }}
-                    contentStyle={{
-                      borderRadius: '8px',
-                      border: 'none',
-                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                    }}
-                  />
-                  <Bar dataKey="use" fill="#ea580c" radius={[0, 4, 4, 0]} barSize={12} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            {/* Custom Labels for Bar Chart */}
-            <div className="flex flex-col gap-2 mt-2">
-              {topIngredientsMock.slice(0, 3).map((item, i) => (
-                <div key={i} className="flex justify-between items-center text-xs font-body">
-                  <span className="text-slate-600 font-medium">{item.name}</span>
-                  <span className="font-bold text-slate-900">{item.use}%</span>
+            {charts.topIngredients && charts.topIngredients.length > 0 ? (
+              <>
+                <div className="h-[150px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={charts.topIngredients}
+                      layout="vertical"
+                      margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                    >
+                      <XAxis type="number" hide />
+                      <YAxis dataKey="name" type="category" hide />
+                      <RechartsTooltip
+                        cursor={{ fill: '#f8fafc' }}
+                        contentStyle={{
+                          borderRadius: '8px',
+                          border: 'none',
+                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                        }}
+                        formatter={(value, name, props) => [
+                          `${value} ${props.payload.unit}`,
+                          'Total Consumed',
+                        ]}
+                      />
+                      <Bar dataKey="use" fill="#ea580c" radius={[0, 4, 4, 0]} barSize={12} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-              ))}
-            </div>
+                {/* Custom Labels for Bar Chart */}
+                <div className="flex flex-col gap-2 mt-2">
+                  {charts.topIngredients.map((item, i) => (
+                    <div key={i} className="flex justify-between items-center text-xs font-body">
+                      <span className="text-slate-600 font-medium truncate pr-2" title={item.name}>
+                        {item.name}
+                      </span>
+                      <span className="font-bold text-slate-900 whitespace-nowrap">
+                        {item.use} {item.unit}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-full min-h-[150px]">
+                <p className="text-slate-400 text-xs font-medium">No ingredients consumed yet.</p>
+              </div>
+            )}
           </div>
 
           {/* Category Distribution (Real DB Data) */}

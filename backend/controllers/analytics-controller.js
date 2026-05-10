@@ -60,19 +60,35 @@ export const getDashboardStats = async (req, res) => {
       ORDER BY d.date_val;
     `);
 
+    // NOU: Interogare pentru Top 5 cele mai consumate ingrediente
+    // Împărțim la 10.0 pentru a converti "marmitele" salvate în DB înapoi în "batches" pentru a înmulți cu rețetarul
+    const { rows: topIngredients } = await db.query(`
+      SELECT 
+        i.name,
+        i.unit_of_measure as unit,
+        ROUND(CAST(SUM((pb.quantity_produced / 10.0) * ri.quantity_required) AS numeric), 2) as use
+      FROM Production_Batches pb
+      JOIN Recipe_Ingredient ri ON pb.recipe_id = ri.recipe_id
+      JOIN Ingredient i ON ri.ingredient_id = i.id
+      GROUP BY i.name, i.unit_of_measure
+      ORDER BY use DESC
+      LIMIT 5
+    `);
+
     // Trimitem totul ca un singur pachet JSON curat
     res.status(200).json({
       kpis: {
         lowStockAlerts: parseInt(lowStockRows[0].count, 10),
         activeMarmites: parseInt(activeMarmitesRows[0].total, 10),
         totalIngredients: parseInt(totalIngredientsRows[0].count, 10),
-        productionEfficiency: 94, // O lăsăm fixă momentan
+        productionEfficiency: 92, // O lăsăm fixă momentan
       },
       charts: {
         categoryDistribution,
         topRecipes,
         criticalStock,
-        weeklyVolume, // Adăugăm datele noi aici!
+        weeklyVolume,
+        topIngredients,
       },
     });
   } catch (error) {

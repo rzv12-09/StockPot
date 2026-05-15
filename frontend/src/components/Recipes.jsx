@@ -274,7 +274,7 @@ const Recipes = () => {
                 Standard Batch Ingredients
               </h3>
               <span className="text-xs font-bold text-orange-700 bg-orange-100 px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">
-                Yield: 10 Stockpots
+                Yield: 10 Soup Pots
               </span>
             </div>
 
@@ -394,7 +394,7 @@ const Recipes = () => {
             {/* Action Card (Publishing) */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col">
               <h3 className="font-manrope text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">
-                Publishing
+                RECIPE INFO
               </h3>
               <div className="flex flex-col gap-4">
                 {selectedRecipe ? (

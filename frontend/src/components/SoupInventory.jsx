@@ -61,7 +61,7 @@ const SoupInventory = () => {
               </p>
               <p className="text-3xl font-manrope font-black text-slate-900 leading-none">
                 {totalQuantity}{' '}
-                <span className="text-lg text-slate-400 font-bold ml-0.5">Marmites</span>
+                <span className="text-lg text-slate-400 font-bold ml-0.5">Soup Pots</span>
               </p>
             </div>
           </div>
@@ -75,7 +75,6 @@ const SoupInventory = () => {
           <div className="w-full text-left font-body">
             {/* Header Row */}
             <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 rounded-lg text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 font-manrope">
-              <div className="col-span-2">Batch ID</div>
               <div className="col-span-4">Soup Name</div>
               <div className="col-span-3">Prod. Date</div>
               <div className="col-span-1 text-right">Volume</div>
@@ -99,9 +98,9 @@ const SoupInventory = () => {
                         isEven ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/50 hover:bg-slate-50'
                       }`}
                     >
-                      <div className="col-span-2 font-manrope font-bold text-slate-900">
+                      {/* <div className="col-span-2 font-manrope font-bold text-slate-900">
                         B-{item.id.toString().padStart(4, '0')}
-                      </div>
+                      </div> */}
 
                       <div className="col-span-4 font-semibold text-slate-800 truncate pr-2">
                         {item.recipe_name}

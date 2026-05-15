@@ -95,7 +95,8 @@ const Analytics = () => {
             </span>
           </div>
           <p className="text-3xl font-manrope font-black text-slate-900 tracking-tight">
-            {kpis.activeMarmites} <span className="text-lg font-bold text-slate-400">Marmites</span>
+            {kpis.activeMarmites}{' '}
+            <span className="text-lg font-bold text-slate-400">Soup pots</span>
           </p>
           <div className="mt-2 flex items-center gap-1 text-xs font-body">
             <span className="text-slate-400">Currently in Cold Storage</span>
@@ -133,7 +134,7 @@ const Analytics = () => {
             </span>
           </div>
           <p className="text-3xl font-manrope font-black text-teal-700 tracking-tight">
-            {kpis.productionEfficiency}%
+            {kpis.productionEfficiency}% TODO
           </p>
           <div className="mt-2 flex items-center gap-1 text-xs font-body">
             <span className="material-symbols-outlined text-[14px] text-teal-600">trending_up</span>
@@ -255,6 +256,7 @@ const Analytics = () => {
             <h3 className="font-manrope text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">
               Inventory Categories
             </h3>
+            <h3>TODO</h3>
             <div className="flex-1 min-h-[150px] relative flex items-center justify-center">
               {charts.categoryDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">

@@ -67,7 +67,7 @@ const Production = () => {
         quantity_produced: quantity,
       });
       // Confirmare vizuală pentru câte marmite au ajuns efectiv în frigider
-      setSuccess(`Production batch recorded! Added ${quantity * 10} marmites to inventory.`);
+      setSuccess(`Production batch recorded! Added ${quantity * 10} soup pots to inventory.`);
       setQuantity(1); // Resetăm cantitatea
     } catch (err) {
       setError(err.message);
@@ -147,11 +147,11 @@ const Production = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider font-manrope">
-                    Marmites Produced
+                    Soup Pots Produced
                   </label>
                   <div className="w-full bg-slate-100 rounded-lg py-3 px-4 text-slate-900 text-center text-xl font-bold font-manrope">
                     {quantity * 10}{' '}
-                    <span className="text-sm font-normal text-slate-500 font-body">Marmites</span>
+                    <span className="text-sm font-normal text-slate-500 font-body">Soup pots</span>
                   </div>
                 </div>
               </div>

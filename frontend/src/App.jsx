@@ -137,9 +137,7 @@ function AppContent({ user, onLogout }) {
               </span>
             </button>
 
-            <div className="hidden md:block text-lg font-black text-slate-900">
-              Culinary Management
-            </div>
+            <div className="hidden md:block text-lg font-black text-slate-900">{/*to add*/}</div>
           </div>
 
           {/* Zona din dreapta cu profilul și logout */}
@@ -170,8 +168,9 @@ function AppContent({ user, onLogout }) {
               element={
                 <div>
                   <h2 className="font-manrope text-4xl text-slate-900 font-extrabold mb-2 tracking-tight">
-                    Welcome back, {user?.username}! 👋
+                    Welcome back, {user?.username}!
                   </h2>
+                  <h2 className="font-manrope text-2xl font-extrabold mb-1 ">TODO</h2>
                   <p className="text-slate-500 font-body">
                     Select a module from the left menu to get started.
                   </p>

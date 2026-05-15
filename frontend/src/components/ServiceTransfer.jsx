@@ -159,7 +159,7 @@ const ServiceTransfer = () => {
                         <p className="text-xs text-slate-500">Available:</p>
                         <p className="text-sm font-semibold text-slate-900">
                           {item.current_quantity}{' '}
-                          <span className="text-slate-500 text-xs font-normal">marmites</span>
+                          <span className="text-slate-500 text-xs font-normal">Soup pots</span>
                         </p>
                       </div>
                     </div>
@@ -194,7 +194,7 @@ const ServiceTransfer = () => {
                   1
                 </div>
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-                  Full Marmite
+                  Full Soup Pot
                 </div>
               </div>
             </div>

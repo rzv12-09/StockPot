@@ -86,7 +86,7 @@ const Auth = ({ onLoginSuccess }) => {
                 StockPot
               </h1>
               <p className="font-body text-[#5a4138] text-sm mt-1">
-                Editorial Precision in Every Ladle.
+                Editorial Precision in Every Restaurant
               </p>
             </div>
           </div>

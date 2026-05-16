@@ -6,6 +6,8 @@ import productionRouter from './production-router.js';
 import serviceRouter from './service-router.js';
 import analyticsRouter from './analytics-router.js';
 import userRouter from './user-router.js';
+import invoiceRouter from './invoice-router.js';
+import supplierRouter from './supplier-router.js';
 import { authenticateToken } from '../middlewares/auth-middleware.js';
 
 const router = express.Router();
@@ -19,5 +21,7 @@ router.use('/production', productionRouter);
 router.use('/service', serviceRouter);
 router.use('/users', userRouter);
 router.use('/analytics', analyticsRouter);
+router.use('/invoices', invoiceRouter);
+router.use('/suppliers', supplierRouter);
 
 export default router;

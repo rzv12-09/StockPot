@@ -13,3 +13,5 @@ sa pot sa vad monthly production volume si sa vad si pe fiecare ciorba in parte
 grafic cu consumul de ciorba saptamanal (total si pe fiecare ciorba in parte)
 tab de facturare si vizualizare istoric facturi
 posibilitate de incarcare poza factura
+sa pot sa adaug supiere, editez, etc
+search-bar lista ingrediente la creare/editare retete 

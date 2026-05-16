@@ -8,6 +8,7 @@ import SoupInventory from './components/SoupInventory';
 import ServiceTransfer from './components/ServiceTransfer';
 import UsersManagement from './components/UserManagement';
 import Analytics from './components/Analytics';
+import Invoices from './components/Invoices';
 
 // Componenta pentru butoanele din meniu (Acum știe dacă meniul e restrâns sau nu)
 const NavItem = ({ to, icon, label, isCollapsed }) => {
@@ -88,12 +89,20 @@ function AppContent({ user, onLogout }) {
 
           {/* Ascundem tab-ul de inventar dacă NU ești manager */}
           {isManager && (
-            <NavItem
-              to="/ingredients"
-              icon="inventory_2"
-              label="Inventory"
-              isCollapsed={isCollapsed}
-            />
+            <>
+              <NavItem
+                to="/ingredients"
+                icon="inventory_2"
+                label="Inventory"
+                isCollapsed={isCollapsed}
+              />
+              <NavItem
+                to="/invoices"
+                icon="receipt_long"
+                label="Invoices"
+                isCollapsed={isCollapsed}
+              />
+            </>
           )}
 
           <NavItem to="/recipes" icon="menu_book" label="Recipes" isCollapsed={isCollapsed} />
@@ -179,6 +188,7 @@ function AppContent({ user, onLogout }) {
             />
             {/* Rute protejate */}
             {isManager && <Route path="/ingredients" element={<Ingredients />} />}
+            {isManager && <Route path="/invoices" element={<Invoices />} />}
             <Route path="/recipes" element={<Recipes />} />
             <Route path="/production" element={<Production />} />
             <Route path="/soup-inventory" element={<SoupInventory />} />

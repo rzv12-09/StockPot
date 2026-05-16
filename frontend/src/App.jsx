@@ -9,6 +9,7 @@ import ServiceTransfer from './components/ServiceTransfer';
 import UsersManagement from './components/UserManagement';
 import Analytics from './components/Analytics';
 import Invoices from './components/Invoices';
+import Dashboard from './components/Dashboard';
 
 // Componenta pentru butoanele din meniu (Acum știe dacă meniul e restrâns sau nu)
 const NavItem = ({ to, icon, label, isCollapsed }) => {
@@ -172,20 +173,7 @@ function AppContent({ user, onLogout }) {
         {/* CANVA PENTRU COMPONENTE DINAMICE */}
         <main className="flex-1 overflow-y-auto p-8 lg:p-12 pb-24">
           <Routes>
-            <Route
-              path="/"
-              element={
-                <div>
-                  <h2 className="font-manrope text-4xl text-slate-900 font-extrabold mb-2 tracking-tight">
-                    Welcome back, {user?.username}!
-                  </h2>
-                  <h2 className="font-manrope text-2xl font-extrabold mb-1 ">TODO</h2>
-                  <p className="text-slate-500 font-body">
-                    Select a module from the left menu to get started.
-                  </p>
-                </div>
-              }
-            />
+            <Route path="/" element={<Dashboard user={user} />} />
             {/* Rute protejate */}
             {isManager && <Route path="/ingredients" element={<Ingredients />} />}
             {isManager && <Route path="/invoices" element={<Invoices />} />}

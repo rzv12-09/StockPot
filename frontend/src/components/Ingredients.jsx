@@ -10,7 +10,6 @@ const Ingredients = () => {
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('Toate Categoriile');
 
   // State pentru Modal
@@ -121,7 +120,7 @@ const Ingredients = () => {
   if (error) return <div className="text-red-500">Eroare: {error}</div>;
 
   // Filtrăm lista bazat pe categoria selectată
-  const filteredIngredients =
+ 
   const filteredIngredients =
     selectedCategory === 'Toate Categoriile'
       ? ingredients
@@ -162,7 +161,6 @@ const Ingredients = () => {
       {/* Stats/Filter Row */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
         <div className="md:col-span-8 flex gap-4">
-        <div className="md:col-span-8 flex gap-4">
           <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1 transition-all">
             <p className="font-body text-sm font-semibold text-slate-500 mb-1">Total Ingrediente</p>
             <div className="text-2xl font-manrope font-bold text-orange-600">{totalItems}</div>
@@ -180,7 +178,6 @@ const Ingredients = () => {
             </div>
           ) : (
             <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1 transition-all">
-            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1 transition-all">
               <p className="font-body text-sm font-semibold text-slate-500 mb-1">
                 Alerte Stoc Scăzut
               </p>
@@ -194,7 +191,6 @@ const Ingredients = () => {
           )}
         </div>
         <div className="md:col-span-4 bg-slate-100 rounded-xl p-6 flex flex-col justify-center">
-          <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
           <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
             Filtru Rapid
           </label>

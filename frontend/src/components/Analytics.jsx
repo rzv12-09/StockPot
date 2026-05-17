@@ -88,7 +88,7 @@ const Analytics = () => {
           <div className="absolute right-0 top-0 w-32 h-32 bg-sky-500/5 rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-sm font-manrope font-bold text-slate-500 uppercase tracking-wider">
-              Active Batches
+              Soup Inventory
             </h3>
             <span className="material-symbols-outlined text-sky-600 p-2 bg-sky-50 rounded-lg">
               soup_kitchen
@@ -96,7 +96,7 @@ const Analytics = () => {
           </div>
           <p className="text-3xl font-manrope font-black text-slate-900 tracking-tight">
             {kpis.activeMarmites}{' '}
-            <span className="text-lg font-bold text-slate-400">Soup pots</span>
+            <span className="text-lg font-bold text-slate-400">Liters</span>
           </p>
           <div className="mt-2 flex items-center gap-1 text-xs font-body">
             <span className="text-slate-400">Currently in Cold Storage</span>
@@ -152,7 +152,7 @@ const Analytics = () => {
             <h3 className="font-manrope text-lg font-bold text-slate-900">
               Weekly Production Volume
             </h3>
-            <p className="text-sm font-body text-slate-500">Marmites produced per day</p>
+            <p className="text-sm font-body text-slate-500">Liters produced per day</p>
           </div>
           <div className="flex-1 w-full h-full min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -321,7 +321,7 @@ const Analytics = () => {
                       <td className="px-6 py-4 font-semibold text-slate-900">{recipe.name}</td>
                       <td className="px-6 py-4 text-slate-500">{recipe.frequency} Batches</td>
                       <td className="px-6 py-4 text-right font-manrope font-bold text-orange-600">
-                        {recipe.total_volume} Marmites
+                        {recipe.total_volume} Liters
                       </td>
                     </tr>
                   ))

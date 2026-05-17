@@ -159,7 +159,7 @@ const ServiceTransfer = () => {
                         <p className="text-xs text-slate-500">Available:</p>
                         <p className="text-sm font-semibold text-slate-900">
                           {item.current_quantity}{' '}
-                          <span className="text-slate-500 text-xs font-normal">Soup pots</span>
+                          <span className="text-slate-500 text-xs font-normal">Liters</span>
                         </p>
                       </div>
                     </div>
@@ -191,10 +191,10 @@ const ServiceTransfer = () => {
             <div className="flex justify-center items-center bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
               <div className="text-center">
                 <div className="font-manrope text-5xl font-black text-orange-600 tracking-tighter">
-                  1
+                  10
                 </div>
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-                  Full Soup Pot
+                  Liters to Transfer
                 </div>
               </div>
             </div>
@@ -258,7 +258,7 @@ const ServiceTransfer = () => {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-manrope font-bold text-lg text-orange-600">1 M</p>
+                          <p className="font-manrope font-bold text-lg text-orange-600">10 L</p>
                         </div>
                       </div>
                     </div>

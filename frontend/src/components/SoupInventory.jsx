@@ -61,7 +61,7 @@ const SoupInventory = () => {
               </p>
               <p className="text-3xl font-manrope font-black text-slate-900 leading-none">
                 {totalQuantity}{' '}
-                <span className="text-lg text-slate-400 font-bold ml-0.5">Soup Pots</span>
+                <span className="text-lg text-slate-400 font-bold ml-0.5">Liters</span>
               </p>
             </div>
           </div>
@@ -116,7 +116,8 @@ const SoupInventory = () => {
                       </div>
 
                       <div className="col-span-1 text-right font-manrope font-extrabold text-orange-600 text-lg">
-                        {item.current_quantity}
+                        {item.current_quantity}{' '}
+                        <span className="text-sm font-normal text-slate-500 ml-0.5">L</span>
                       </div>
 
                       <div className="col-span-2 text-right">

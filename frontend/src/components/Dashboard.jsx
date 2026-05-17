@@ -78,11 +78,11 @@ const Dashboard = ({ user }) => {
         {/* KPI 1: Active Batches */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
-            <h3 className="text-sm font-manrope font-bold text-slate-500 uppercase tracking-wider">Active Batches</h3>
+            <h3 className="text-sm font-manrope font-bold text-slate-500 uppercase tracking-wider">Soup Inventory</h3>
             <span className="material-symbols-outlined text-sky-600 p-2 bg-sky-50 rounded-lg">soup_kitchen</span>
           </div>
           <p className="text-3xl font-manrope font-black text-slate-900 tracking-tight">
-            {kpis.activeMarmites} <span className="text-lg font-bold text-slate-400">Pots</span>
+            {kpis.activeMarmites} <span className="text-lg font-bold text-slate-400">Liters</span>
           </p>
         </div>
 
@@ -171,7 +171,7 @@ const Dashboard = ({ user }) => {
                       <span className="font-semibold text-slate-800 text-sm">{recipe.name}</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-bold text-slate-900 block text-sm">{recipe.total_volume} <span className="text-slate-500 text-xs font-normal">Marmites</span></span>
+                      <span className="font-bold text-slate-900 block text-sm">{recipe.total_volume} <span className="text-slate-500 text-xs font-normal">Liters</span></span>
                     </div>
                   </div>
                 ))

@@ -31,13 +31,13 @@ export const executeTransfer = async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // 1. Verificăm dacă avem cel puțin 1 marmită disponibilă în Frigider
+    // 1. Verificăm dacă avem cel puțin 10L disponibili în Frigider
     const checkStockQuery = `SELECT current_quantity FROM finished_soups WHERE recipe_id = $1`;
     const { rows: stock } = await client.query(checkStockQuery, [recipe_id]);
 
-    if (stock.length === 0 || stock[0].current_quantity < 1) {
+    if (stock.length === 0 || stock[0].current_quantity < 10) {
       throw new Error(
-        'Not enough marmites in the fridge! You need at least 1 marmite to transfer.'
+        'Not enough soup in the fridge! You need at least 10 Liters to transfer to a serving slot.'
       );
     }
 
@@ -49,13 +49,13 @@ export const executeTransfer = async (req, res) => {
       throw new Error(`Slot ${slot[0].slot_name} is already full! Please empty it first.`);
     }
 
-    // 3. Scădem EXACT O MARMITĂ din Frigider
+    // 3. Scădem EXACT 10L din Frigider
     await client.query(
-      `UPDATE finished_soups SET current_quantity = current_quantity - 1 WHERE recipe_id = $1`,
+      `UPDATE finished_soups SET current_quantity = current_quantity - 10 WHERE recipe_id = $1`,
       [recipe_id]
     );
 
-    // 4. "Băgăm" marmita în Supieră
+    // 4. "Băgăm" ciorba în Supieră
     await client.query(
       `UPDATE Serving_Slots 
        SET recipe_id = $1, last_filled_at = CURRENT_TIMESTAMP 
@@ -64,7 +64,7 @@ export const executeTransfer = async (req, res) => {
     );
 
     await client.query('COMMIT');
-    res.json({ message: 'Transfer successful! 1 marmite placed in the serving slot.' });
+    res.json({ message: 'Transfer successful! 10L placed in the serving slot.' });
   } catch (error) {
     await client.query('ROLLBACK');
     res.status(400).json({ error: error.message });

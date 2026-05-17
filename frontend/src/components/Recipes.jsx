@@ -274,7 +274,7 @@ const Recipes = () => {
                 Standard Batch Ingredients
               </h3>
               <span className="text-xs font-bold text-orange-700 bg-orange-100 px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">
-                Yield: 10 Soup Pots
+                Yield: 50 L
               </span>
             </div>
 

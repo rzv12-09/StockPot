@@ -61,12 +61,12 @@ export const getDashboardStats = async (req, res) => {
     `);
 
     // NOU: Interogare pentru Top 5 cele mai consumate ingrediente
-    // Împărțim la 10.0 pentru a converti "marmitele" salvate în DB înapoi în "batches" pentru a înmulți cu rețetarul
+    // Împărțim la 50.0 pentru a converti "Litrii" salvați în DB înapoi în "batches" pentru a înmulți cu rețetarul
     const { rows: topIngredients } = await db.query(`
       SELECT 
         i.name,
         i.unit_of_measure as unit,
-        ROUND(CAST(SUM((pb.quantity_produced / 10.0) * ri.quantity_required) AS numeric), 2) as use
+        ROUND(CAST(SUM((pb.quantity_produced / 50.0) * ri.quantity_required) AS numeric), 2) as use
       FROM Production_Batches pb
       JOIN Recipe_Ingredient ri ON pb.recipe_id = ri.recipe_id
       JOIN Ingredient i ON ri.ingredient_id = i.id

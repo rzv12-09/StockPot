@@ -86,7 +86,7 @@ function AppContent({ user, onLogout }) {
         </div>
 
         <div className="flex-1 flex flex-col font-manrope tracking-tight text-sm">
-          <NavItem to="/" icon="dashboard" label="Dashboard" isCollapsed={isCollapsed} />
+          <NavItem to="/" icon="dashboard" label="Panou Principal" isCollapsed={isCollapsed} />
 
           {/* Ascundem tab-ul de inventar dacă NU ești manager */}
           {isManager && (
@@ -94,36 +94,36 @@ function AppContent({ user, onLogout }) {
               <NavItem
                 to="/ingredients"
                 icon="inventory_2"
-                label="Inventory"
+                label="Ingrediente"
                 isCollapsed={isCollapsed}
               />
               <NavItem
                 to="/invoices"
                 icon="receipt_long"
-                label="Invoices"
+                label="Facturi"
                 isCollapsed={isCollapsed}
               />
             </>
           )}
 
-          <NavItem to="/recipes" icon="menu_book" label="Recipes" isCollapsed={isCollapsed} />
+          <NavItem to="/recipes" icon="menu_book" label="Rețetar" isCollapsed={isCollapsed} />
           <NavItem
             to="/production"
             icon="soup_kitchen"
-            label="Production"
+            label="Producție"
             isCollapsed={isCollapsed}
           />
           <NavItem
             to="/soup-inventory"
             icon="kitchen"
-            label="Cold Storage"
+            label="Cameră Frigorifică"
             isCollapsed={isCollapsed}
           />
-          <NavItem to="/transfer" icon="swap_horiz" label="Transfers" isCollapsed={isCollapsed} />
+          <NavItem to="/transfer" icon="swap_horiz" label="Transfer Servire" isCollapsed={isCollapsed} />
           {isManager && (
-            <NavItem to="/staff" icon="group" label="Staff" isCollapsed={isCollapsed} />
+            <NavItem to="/staff" icon="group" label="Personal" isCollapsed={isCollapsed} />
           )}
-          <NavItem to="/analytics" icon="analytics" label="Analytics" isCollapsed={isCollapsed} />
+          <NavItem to="/analytics" icon="analytics" label="Rapoarte" isCollapsed={isCollapsed} />
         </div>
       </nav>
 
@@ -140,7 +140,7 @@ function AppContent({ user, onLogout }) {
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-500 hover:text-orange-600 hover:bg-orange-50 transition-colors focus:outline-none"
-              title={isCollapsed ? 'Expand Menu' : 'Collapse Menu'}
+              title={isCollapsed ? 'Extinde Meniul' : 'Restrânge Meniul'}
             >
               <span className="material-symbols-outlined text-[24px]">
                 {isCollapsed ? 'menu_open' : 'menu'}
@@ -163,7 +163,7 @@ function AppContent({ user, onLogout }) {
             <button
               onClick={onLogout}
               className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
-              title="Logout"
+              title="Deconectare"
             >
               <span className="material-symbols-outlined text-[22px]">logout</span>
             </button>

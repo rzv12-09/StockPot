@@ -37,10 +37,10 @@ const SoupInventory = () => {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-6">
         <div>
           <p className="text-sm font-body font-bold text-orange-600 uppercase tracking-wider mb-1">
-            Cold Storage
+            Cameră Frigorifică
           </p>
           <h2 className="text-4xl font-manrope font-extrabold text-slate-900 tracking-tight">
-            Soup Inventory
+            Inventar Ciorbe
           </h2>
         </div>
 
@@ -57,11 +57,11 @@ const SoupInventory = () => {
             </div>
             <div>
               <p className="text-sm font-body text-slate-500 font-bold uppercase tracking-wider mb-0.5">
-                Total Volume
+                Volum Total
               </p>
               <p className="text-3xl font-manrope font-black text-slate-900 leading-none">
                 {totalQuantity}{' '}
-                <span className="text-lg text-slate-400 font-bold ml-0.5">Liters</span>
+                <span className="text-lg text-slate-400 font-bold ml-0.5">Litri</span>
               </p>
             </div>
           </div>
@@ -75,17 +75,17 @@ const SoupInventory = () => {
           <div className="w-full text-left font-body">
             {/* Header Row */}
             <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 rounded-lg text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 font-manrope">
-              <div className="col-span-4">Soup Name</div>
-              <div className="col-span-3">Prod. Date</div>
-              <div className="col-span-1 text-right">Volume</div>
-              <div className="col-span-2 text-right">Action</div>
+              <div className="col-span-4">Nume Ciorbă</div>
+              <div className="col-span-3">Dată Prod.</div>
+              <div className="col-span-1 text-right">Volum</div>
+              <div className="col-span-2 text-right">Acțiune</div>
             </div>
 
             {/* Data Rows */}
             <div className="flex flex-col gap-1">
               {stock.length === 0 ? (
                 <div className="py-12 text-center text-slate-500 font-medium">
-                  The cold room is empty. Go to Production to cook some batches!
+                  Camera frigorifică este goală. Mergi la Producție pentru a găti câteva șarje!
                 </div>
               ) : (
                 stock.map((item, index) => {
@@ -122,7 +122,7 @@ const SoupInventory = () => {
 
                       <div className="col-span-2 text-right">
                         <button className="opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 hover:bg-orange-100 hover:text-orange-700 text-slate-600 text-xs font-bold px-4 py-2 rounded-lg flex items-center justify-end gap-1 ml-auto">
-                          Move to Service
+                          Transferă la Servire
                           <span className="material-symbols-outlined text-[14px]">
                             arrow_forward
                           </span>

@@ -33,7 +33,7 @@ const UsersManagement = () => {
       const active = await getActiveUsers();
       setActiveUsers(active);
     } catch (err) {
-      setError('Failed to load user data.', err);
+      setError('Încărcarea datelor utilizatorilor a eșuat.', err);
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +57,7 @@ const UsersManagement = () => {
       // Dacă nu a selectat nimic, trimitem 'null' ca să se aplice logica ta deșteaptă din backend
       const roleToAssign = selectedRoles[userId] || null;
       await approveUser(userId, roleToAssign);
-      setSuccess('User approved successfully!');
+      setSuccess('Utilizator aprobat cu succes!');
       fetchData(); // Reîncărcăm lista
     } catch (err) {
       setError(err.message);
@@ -65,12 +65,12 @@ const UsersManagement = () => {
   };
 
   const handleReject = async (userId) => {
-    if (!window.confirm('Are you sure you want to reject and delete this request?')) return;
+    if (!window.confirm('Ești sigur că vrei să respingi și să ștergi această cerere?')) return;
     setError('');
     setSuccess('');
     try {
       await rejectUser(userId);
-      setSuccess('User request rejected.');
+      setSuccess('Cererea utilizatorului a fost respinsă.');
       fetchData();
     } catch (err) {
       setError(err.message);
@@ -103,22 +103,22 @@ const UsersManagement = () => {
       <section className="bg-[#e6f6ff] rounded-[1.5rem] p-8 lg:p-10">
         <div className="flex justify-between items-end mb-8">
           <div>
-            <h3 className="font-manrope font-bold text-2xl text-slate-900">Pending Approvals</h3>
+            <h3 className="font-manrope font-bold text-2xl text-slate-900">Aprobări în Așteptare</h3>
             <p className="font-body text-slate-500 mt-2 text-sm">
-              Review and assign roles to new staff requests.
+              Revizuiește și atribuie roluri noilor cereri ale personalului.
             </p>
           </div>
           {pendingUsers.length > 0 && (
             <span className="bg-[#d5ecf8] text-orange-700 font-bold text-xs px-3 py-1.5 rounded-full inline-flex items-center">
               <span className="w-2 h-2 rounded-full bg-orange-600 mr-2"></span>{' '}
-              {pendingUsers.length} New
+              {pendingUsers.length} Noi
             </span>
           )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pendingUsers.length === 0 ? (
-            <p className="text-slate-500 col-span-full">No pending approvals at the moment.</p>
+            <p className="text-slate-500 col-span-full">Nicio aprobare în așteptare momentan.</p>
           ) : (
             pendingUsers.map((user) => (
               <div
@@ -126,7 +126,7 @@ const UsersManagement = () => {
                 className="bg-white rounded-xl p-6 shadow-sm relative group hover:shadow-md transition-all border border-slate-100"
               >
                 <div className="absolute -top-3 -right-3 bg-amber-100 text-amber-800 text-[10px] font-bold uppercase px-3 py-1 rounded-full shadow-sm border border-amber-200/50">
-                  Pending
+                  În Așteptare
                 </div>
                 <div className="flex items-center space-x-4 mb-6">
                   <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 shadow-sm">
@@ -140,20 +140,20 @@ const UsersManagement = () => {
                   <div>
                     <h4 className="font-manrope font-bold text-slate-900">{user.username}</h4>
                     <p className="font-body text-xs text-slate-500 mt-0.5">
-                      Requested: {user.role}
+                      Rol Cerut: {user.role}
                     </p>
                   </div>
                 </div>
                 <div className="mb-6">
-                  <label className="block font-body text-xs text-slate-500 mb-2">Assign Role</label>
+                  <label className="block font-body text-xs text-slate-500 mb-2">Atribuie Rol</label>
                   <div className="relative">
                     <select
                       value={selectedRoles[user.id] || user.role}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
                       className="w-full appearance-none bg-slate-50 border border-slate-200 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 rounded-md px-4 py-2.5 font-body text-sm text-slate-800 outline-none cursor-pointer transition-colors"
                     >
-                      <option value="STAFF">SALES</option>
-                      <option value="PRODUCTION">PRODUCTION</option>
+                      <option value="STAFF">VÂNZĂRI</option>
+                      <option value="PRODUCTION">PRODUCȚIE</option>
                       <option value="MANAGER">MANAGER</option>
                     </select>
                     <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-sm">
@@ -167,14 +167,14 @@ const UsersManagement = () => {
                     className="flex-1 bg-gradient-to-b from-orange-600 to-orange-700 text-white font-body font-semibold text-sm py-2.5 rounded-md hover:shadow-lg transition-shadow flex justify-center items-center"
                   >
                     <span className="material-symbols-outlined text-[18px] mr-1.5">check</span>{' '}
-                    Approve
+                    Aprobă
                   </button>
                   <button
                     onClick={() => handleReject(user.id)}
                     className="flex-1 bg-transparent border border-red-200 text-red-600 font-body font-semibold text-sm py-2.5 rounded-md hover:bg-red-50 hover:border-red-300 transition-colors flex justify-center items-center"
                   >
                     <span className="material-symbols-outlined text-[18px] mr-1.5">close</span>{' '}
-                    Reject
+                    Respinge
                   </button>
                 </div>
               </div>
@@ -187,13 +187,13 @@ const UsersManagement = () => {
       <section className="bg-white rounded-[1.5rem] p-8 lg:p-10 shadow-sm border border-slate-100">
         <div className="mb-8 flex justify-between items-end">
           <div>
-            <h3 className="font-manrope font-bold text-2xl text-slate-900">Active Team Members</h3>
+            <h3 className="font-manrope font-bold text-2xl text-slate-900">Membri Activi ai Echipei</h3>
             <p className="font-body text-slate-500 mt-2 text-sm">
-              Manage existing staff roles and statuses.
+              Gestionează rolurile și statusurile personalului existent.
             </p>
           </div>
           <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors font-body font-semibold text-sm py-2 px-4 rounded-md flex items-center">
-            <span className="material-symbols-outlined text-[18px] mr-2">download</span> Export
+            <span className="material-symbols-outlined text-[18px] mr-2">download</span> Exportă
           </button>
         </div>
         <div className="w-full overflow-x-auto">
@@ -201,16 +201,16 @@ const UsersManagement = () => {
             <thead>
               <tr className="bg-slate-50 rounded-lg">
                 <th className="py-4 px-6 font-manrope font-semibold text-sm text-slate-600 rounded-l-lg">
-                  User
+                  Utilizator
                 </th>
                 <th className="py-4 px-6 font-manrope font-semibold text-sm text-slate-600">
-                  Role
+                  Rol
                 </th>
                 <th className="py-4 px-6 font-manrope font-semibold text-sm text-slate-600">
                   Status
                 </th>
                 <th className="py-4 px-6 font-manrope font-semibold text-sm text-slate-600 text-right rounded-r-lg">
-                  Actions
+                  Acțiuni
                 </th>
               </tr>
             </thead>
@@ -218,7 +218,7 @@ const UsersManagement = () => {
               {activeUsers.length === 0 ? (
                 <tr>
                   <td colSpan="4" className="py-8 px-6 text-center text-slate-500">
-                    No active team members found.
+                    Niciun membru activ al echipei găsit.
                   </td>
                 </tr>
               ) : (
@@ -250,7 +250,7 @@ const UsersManagement = () => {
                     <td className="py-4 px-6 text-teal-600 font-medium capitalize">
                       <span className="flex items-center">
                         <span className="w-1.5 h-1.5 rounded-full bg-teal-500 mr-2"></span>
-                        {user.status.toLowerCase()}
+                        {user.status === 'ACTIVE' ? 'Activ' : user.status.toLowerCase()}
                       </span>
                     </td>
                     <td className="py-4 px-6 text-right">

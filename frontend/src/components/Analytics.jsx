@@ -46,7 +46,7 @@ const Analytics = () => {
   }
 
   if (error)
-    return <div className="text-red-500 font-body p-8">Error loading dashboard: {error}</div>;
+    return <div className="text-red-500 font-body p-8">Eroare la încărcarea panoului: {error}</div>;
 
   const { kpis, charts } = data;
 
@@ -55,10 +55,10 @@ const Analytics = () => {
       {/* Header */}
       <div className="mb-8">
         <h2 className="font-manrope text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-          Analytics Dashboard
+          Panou Analize
         </h2>
         <p className="font-body text-slate-500 text-sm max-w-2xl">
-          Real-time insights into your culinary operations, inventory, and production metrics.
+          Analize în timp real ale operațiunilor culinare, inventarului și producției.
         </p>
       </div>
 
@@ -69,7 +69,7 @@ const Analytics = () => {
           <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-sm font-manrope font-bold text-slate-500 uppercase tracking-wider">
-              Total Ingredients
+              Total Ingrediente
             </h3>
             <span className="material-symbols-outlined text-orange-600 p-2 bg-orange-50 rounded-lg">
               kitchen
@@ -79,7 +79,7 @@ const Analytics = () => {
             {kpis.totalIngredients}
           </p>
           <div className="mt-2 flex items-center gap-1 text-xs font-body">
-            <span className="text-slate-400">Registered in nomenclature</span>
+            <span className="text-slate-400">Înregistrate în nomenclator</span>
           </div>
         </div>
 
@@ -88,7 +88,7 @@ const Analytics = () => {
           <div className="absolute right-0 top-0 w-32 h-32 bg-sky-500/5 rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-sm font-manrope font-bold text-slate-500 uppercase tracking-wider">
-              Soup Inventory
+              Inventar Ciorbe
             </h3>
             <span className="material-symbols-outlined text-sky-600 p-2 bg-sky-50 rounded-lg">
               soup_kitchen
@@ -96,10 +96,10 @@ const Analytics = () => {
           </div>
           <p className="text-3xl font-manrope font-black text-slate-900 tracking-tight">
             {kpis.activeMarmites}{' '}
-            <span className="text-lg font-bold text-slate-400">Liters</span>
+            <span className="text-lg font-bold text-slate-400">Litri</span>
           </p>
           <div className="mt-2 flex items-center gap-1 text-xs font-body">
-            <span className="text-slate-400">Currently in Cold Storage</span>
+            <span className="text-slate-400">În camera frigorifică</span>
           </div>
         </div>
 
@@ -108,17 +108,17 @@ const Analytics = () => {
           <div className="absolute right-0 top-0 w-32 h-32 bg-red-500/5 rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-sm font-manrope font-bold text-red-600 uppercase tracking-wider">
-              Low Stock Alerts
+              Alerte Stoc Scăzut
             </h3>
             <span className="material-symbols-outlined text-red-600 p-2 bg-red-50 rounded-lg">
               warning
             </span>
           </div>
           <p className="text-3xl font-manrope font-black text-red-600 tracking-tight">
-            {kpis.lowStockAlerts} <span className="text-lg font-bold text-red-400/70">Items</span>
+            {kpis.lowStockAlerts} <span className="text-lg font-bold text-red-400/70">Articole</span>
           </p>
           <div className="mt-2 flex items-center gap-1 text-xs font-body text-red-500 font-medium">
-            Review inventory immediately
+            Revizuiește inventarul imediat
           </div>
         </div>
 
@@ -127,7 +127,7 @@ const Analytics = () => {
           <div className="absolute right-0 top-0 w-32 h-32 bg-teal-500/5 rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-sm font-manrope font-bold text-slate-500 uppercase tracking-wider">
-              Efficiency
+              Eficiență
             </h3>
             <span className="material-symbols-outlined text-teal-600 p-2 bg-teal-50 rounded-lg">
               speed
@@ -139,7 +139,7 @@ const Analytics = () => {
           <div className="mt-2 flex items-center gap-1 text-xs font-body">
             <span className="material-symbols-outlined text-[14px] text-teal-600">trending_up</span>
             <span className="text-teal-600 font-bold">+1.2%</span>
-            <span className="text-slate-400">vs target</span>
+            <span className="text-slate-400">față de țintă</span>
           </div>
         </div>
       </div>
@@ -150,9 +150,9 @@ const Analytics = () => {
         <div className="lg:col-span-8 bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col min-h-[360px]">
           <div className="mb-6">
             <h3 className="font-manrope text-lg font-bold text-slate-900">
-              Weekly Production Volume
+              Volum Producție Săptămânală
             </h3>
-            <p className="text-sm font-body text-slate-500">Liters produced per day</p>
+            <p className="text-sm font-body text-slate-500">Litri produși pe zi</p>
           </div>
           <div className="flex-1 w-full h-full min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -201,7 +201,7 @@ const Analytics = () => {
           {/* Top Ingredients (Real DB Data) */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex-1">
             <h3 className="font-manrope text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">
-              Top Ingredients Used
+              Top Ingrediente Folosite
             </h3>
             {charts.topIngredients && charts.topIngredients.length > 0 ? (
               <>
@@ -223,7 +223,7 @@ const Analytics = () => {
                         }}
                         formatter={(value, name, props) => [
                           `${value} ${props.payload.unit}`,
-                          'Total Consumed',
+                          'Total Consumat',
                         ]}
                       />
                       <Bar dataKey="use" fill="#ea580c" radius={[0, 4, 4, 0]} barSize={12} />
@@ -246,7 +246,7 @@ const Analytics = () => {
               </>
             ) : (
               <div className="flex items-center justify-center h-full min-h-[150px]">
-                <p className="text-slate-400 text-xs font-medium">No ingredients consumed yet.</p>
+                <p className="text-slate-400 text-xs font-medium">Niciun ingredient consumat încă.</p>
               </div>
             )}
           </div>
@@ -254,7 +254,7 @@ const Analytics = () => {
           {/* Category Distribution (Real DB Data) */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex-1 flex flex-col">
             <h3 className="font-manrope text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">
-              Inventory Categories
+              Categorii Inventar
             </h3>
             <h3>TODO</h3>
             <div className="flex-1 min-h-[150px] relative flex items-center justify-center">
@@ -283,7 +283,7 @@ const Analytics = () => {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-slate-400 text-xs">No category data.</p>
+                <p className="text-slate-400 text-xs">Fără date de categorie.</p>
               )}
             </div>
           </div>
@@ -296,32 +296,32 @@ const Analytics = () => {
         <div className="lg:col-span-8 bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden flex flex-col">
           <div className="p-6 pb-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
             <h3 className="font-manrope text-lg font-bold text-slate-900">
-              Top Performing Recipes
+              Cele Mai Bune Rețete
             </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 text-xs font-manrope font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="px-6 py-4">Recipe Name</th>
-                  <th className="px-6 py-4">Times Cooked</th>
-                  <th className="px-6 py-4 text-right">Total Volume</th>
+                  <th className="px-6 py-4">Nume Rețetă</th>
+                  <th className="px-6 py-4">Șarje Gătite</th>
+                  <th className="px-6 py-4 text-right">Volum Total</th>
                 </tr>
               </thead>
               <tbody className="text-sm font-body text-slate-800 divide-y divide-slate-100">
                 {charts.topRecipes.length === 0 ? (
                   <tr>
                     <td colSpan="3" className="px-6 py-8 text-center text-slate-500">
-                      No production data yet.
+                      Fără date de producție încă.
                     </td>
                   </tr>
                 ) : (
                   charts.topRecipes.map((recipe, index) => (
                     <tr key={index} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4 font-semibold text-slate-900">{recipe.name}</td>
-                      <td className="px-6 py-4 text-slate-500">{recipe.frequency} Batches</td>
+                      <td className="px-6 py-4 text-slate-500">{recipe.frequency} Șarje</td>
                       <td className="px-6 py-4 text-right font-manrope font-bold text-orange-600">
-                        {recipe.total_volume} Liters
+                        {recipe.total_volume} Litri
                       </td>
                     </tr>
                   ))
@@ -334,12 +334,12 @@ const Analytics = () => {
         {/* Critical Stock Heatmap (Real DB Data) */}
         <div className="lg:col-span-4 bg-white border border-slate-200 shadow-sm rounded-xl p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-manrope text-lg font-bold text-slate-900">Critical Stock</h3>
+            <h3 className="font-manrope text-lg font-bold text-slate-900">Stoc Critic</h3>
             <span className="material-symbols-outlined text-red-500">local_fire_department</span>
           </div>
           <div className="space-y-3">
             {charts.criticalStock.length === 0 ? (
-              <p className="text-slate-500 text-sm">All ingredients are well stocked!</p>
+              <p className="text-slate-500 text-sm">Toate ingredientele au stoc suficient!</p>
             ) : (
               charts.criticalStock.map((item, index) => (
                 <div
@@ -349,7 +349,7 @@ const Analytics = () => {
                   <div>
                     <p className="text-sm font-manrope font-bold text-slate-900">{item.name}</p>
                     <p className="text-xs text-slate-500 font-body mt-0.5">
-                      Alert limit: {item.alert_threshold}
+                      Limită alertă: {item.alert_threshold}
                     </p>
                   </div>
                   <div className="text-right flex flex-col items-end">
@@ -357,7 +357,7 @@ const Analytics = () => {
                       {item.current_stock}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider font-bold text-red-500">
-                      Current
+                      Curent
                     </span>
                   </div>
                 </div>

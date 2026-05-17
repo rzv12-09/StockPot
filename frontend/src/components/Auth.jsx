@@ -22,11 +22,11 @@ const Auth = ({ onLoginSuccess }) => {
     setSuccess('');
 
     if (!isLogin && password !== confirmPassword) {
-      return setError('Passwords do not match!');
+      return setError('Parolele nu coincid!');
     }
 
     if (!isLogin && !role) {
-      return setError('Please select a role.');
+      return setError('Vă rugăm să selectați un rol.');
     }
 
     setIsLoading(true);
@@ -39,7 +39,7 @@ const Auth = ({ onLoginSuccess }) => {
         onLoginSuccess(data.user);
       } else {
         await register(username, password, role);
-        setSuccess('Registration successful! Waiting for manager approval.');
+        setSuccess('Înregistrare cu succes! Așteaptă aprobarea managerului.');
         setTimeout(() => {
           setIsLogin(true);
           setPassword('');
@@ -86,7 +86,7 @@ const Auth = ({ onLoginSuccess }) => {
                 StockPot
               </h1>
               <p className="font-body text-[#5a4138] text-sm mt-1">
-                Editorial Precision in Every Restaurant
+                Gestiune Culinară de Precizie
               </p>
             </div>
           </div>
@@ -102,7 +102,7 @@ const Auth = ({ onLoginSuccess }) => {
                   : 'text-[#5a4138] font-medium hover:text-[#071e27]'
               }`}
             >
-              Sign In
+              Autentificare
             </button>
             <button
               type="button"
@@ -113,7 +113,7 @@ const Auth = ({ onLoginSuccess }) => {
                   : 'text-[#5a4138] font-medium hover:text-[#071e27]'
               }`}
             >
-              Sign Up
+              Înregistrare
             </button>
           </div>
 
@@ -147,7 +147,7 @@ const Auth = ({ onLoginSuccess }) => {
                   htmlFor="username"
                   className="absolute left-4 top-4 text-[#5a4138] font-label text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
                 >
-                  Username
+                  Utilizator
                 </label>
               </div>
 
@@ -166,7 +166,7 @@ const Auth = ({ onLoginSuccess }) => {
                   htmlFor="password"
                   className="absolute left-4 top-4 text-[#5a4138] font-label text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
                 >
-                  Password
+                  Parolă
                 </label>
                 <button
                   type="button"
@@ -195,7 +195,7 @@ const Auth = ({ onLoginSuccess }) => {
                     htmlFor="confirm_password"
                     className="absolute left-4 top-4 text-[#5a4138] font-label text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
                   >
-                    Confirm Password
+                    Confirmă Parola
                   </label>
                 </div>
               )}
@@ -211,14 +211,14 @@ const Auth = ({ onLoginSuccess }) => {
                   className="peer w-full bg-[#d5ecf8] border-0 border-b-2 border-[#e3bfb2]/30 px-4 pt-6 pb-2 rounded-t text-[#071e27] font-body text-base focus:bg-white focus:ring-0 focus:border-[#ad2c00] transition-colors appearance-none outline-none cursor-pointer"
                 >
                   <option disabled value="">
-                    Select your role...
+                    Selectează rolul...
                   </option>
                   <option value="MANAGER">MANAGER</option>
                   <option value="SALES">SALES</option>
                   <option value="PRODUCTION">PRODUCTION</option>
                 </select>
                 <label className="absolute left-4 top-2 text-[#ad2c00] font-label text-xs transition-all">
-                  Role
+                  Rol
                 </label>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 pt-4 text-[#5a4138]">
                   <span className="material-symbols-outlined">expand_more</span>
@@ -235,14 +235,14 @@ const Auth = ({ onLoginSuccess }) => {
                     className="w-4 h-4 rounded text-[#ad2c00] border-[#e3bfb2]/50 bg-[#d5ecf8] focus:ring-[#ad2c00] focus:ring-offset-white"
                   />
                   <span className="font-label text-sm text-[#5a4138] group-hover:text-[#071e27] transition-colors">
-                    Remember me
+                    Ține-mă minte
                   </span>
                 </label>
                 <a
                   href="#"
                   className="font-label text-sm text-[#ad2c00] font-medium hover:text-[#d34011] transition-colors"
                 >
-                  Forgot Password?
+                  Ai uitat parola?
                 </a>
               </div>
             )}
@@ -253,8 +253,8 @@ const Auth = ({ onLoginSuccess }) => {
                 <div className="flex gap-3">
                   <span className="material-symbols-outlined text-[#ad2c00] text-xl">info</span>
                   <p className="font-body text-sm text-[#5a4138] leading-relaxed">
-                    Your account requires manual approval by a{' '}
-                    <span className="font-semibold text-[#071e27]">Manager</span> before access.
+                    Contul tău necesită aprobare manuală din partea unui{' '}
+                    <span className="font-semibold text-[#071e27]">Manager</span> înainte de a putea accesa aplicația.
                   </p>
                 </div>
               </div>
@@ -269,9 +269,9 @@ const Auth = ({ onLoginSuccess }) => {
               {isLoading ? (
                 <span className="material-symbols-outlined animate-spin">refresh</span>
               ) : isLogin ? (
-                'Sign In'
+                'Autentificare'
               ) : (
-                'Request Access'
+                'Cere Acces'
               )}
             </button>
           </form>

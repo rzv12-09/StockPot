@@ -22,7 +22,7 @@ const ServiceTransfer = () => {
       setFridgeStock(stockData.filter((item) => item.current_quantity > 0)); // Arătăm doar ce e în stoc
       setServingSlots(slotsData);
     } catch (err) {
-      setError('Failed to load transfer data.');
+      setError('Încărcarea datelor de transfer a eșuat.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -46,7 +46,7 @@ const ServiceTransfer = () => {
         slot_id: selectedSlot.id,
       });
       setSuccess(
-        `Successfully transferred ${selectedRecipe.recipe_name} to ${selectedSlot.slot_name}!`
+        `S-a transferat cu succes ${selectedRecipe.recipe_name} la ${selectedSlot.slot_name}!`
       );
       setSelectedRecipe(null);
       setSelectedSlot(null);
@@ -59,14 +59,14 @@ const ServiceTransfer = () => {
   };
 
   const handleEmptySlot = async (slotId) => {
-    if (!window.confirm('Are you sure you want to empty this pan?')) return;
+    if (!window.confirm('Ești sigur că vrei să golești această supieră?')) return;
 
     setError('');
     setSuccess('');
 
     try {
       await emptyServingSlot(slotId);
-      setSuccess('Pan emptied successfully!');
+      setSuccess('Supiera a fost golită cu succes!');
       if (selectedSlot?.id === slotId) setSelectedSlot(null);
       await fetchData(); // Reîncărcăm datele
     } catch (err) {
@@ -89,10 +89,10 @@ const ServiceTransfer = () => {
       {/* Header Pagină - Stil Standardizat */}
       <div className="mb-8">
         <h2 className="font-manrope text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-          Service Transfer
+          Transfer Servire
         </h2>
         <p className="font-body text-slate-500 text-sm max-w-2xl">
-          Move prepared batches from the cold room to the active serving line.
+          Transferă șarjele preparate din camera frigorifică pe linia de servire activă.
         </p>
       </div>
 
@@ -114,11 +114,11 @@ const ServiceTransfer = () => {
         <section className="lg:col-span-4 flex flex-col max-h-[800px]">
           <h3 className="font-manrope text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <span className="material-symbols-outlined text-sky-600">kitchen</span>
-            Frigorific Storage
+            Depozit Frigorific
           </h3>
           <div className="bg-white rounded-xl p-4 flex-1 overflow-y-auto space-y-3 shadow-sm border border-slate-200">
             {fridgeStock.length === 0 ? (
-              <p className="text-slate-500 text-center py-4">No stock available.</p>
+              <p className="text-slate-500 text-center py-4">Niciun stoc disponibil.</p>
             ) : (
               fridgeStock.map((item) => {
                 const isSelected = selectedRecipe?.recipe_id === item.recipe_id;
@@ -156,10 +156,10 @@ const ServiceTransfer = () => {
                         </h4>
                       </div>
                       <div className="flex justify-between items-end mt-1">
-                        <p className="text-xs text-slate-500">Available:</p>
+                        <p className="text-xs text-slate-500">Disponibil:</p>
                         <p className="text-sm font-semibold text-slate-900">
                           {item.current_quantity}{' '}
-                          <span className="text-slate-500 text-xs font-normal">Liters</span>
+                          <span className="text-slate-500 text-xs font-normal">Litri</span>
                         </p>
                       </div>
                     </div>
@@ -177,13 +177,13 @@ const ServiceTransfer = () => {
 
             <div className="text-center mb-8 relative z-10">
               <span className="inline-block px-3 py-1 bg-slate-100 text-orange-600 rounded-full text-xs font-bold tracking-widest uppercase mb-4">
-                Transferring
+                Transfer
               </span>
               <h3 className="font-manrope text-2xl font-black text-slate-900 mb-1 leading-tight">
-                {selectedRecipe ? selectedRecipe.recipe_name : 'Select a Soup'}
+                {selectedRecipe ? selectedRecipe.recipe_name : 'Selectează o Ciorbă'}
               </h3>
               <p className="text-slate-500 text-sm font-mono mt-2">
-                {selectedSlot ? `To ${selectedSlot.slot_name}` : 'Select destination pan'}
+                {selectedSlot ? `La ${selectedSlot.slot_name}` : 'Selectează supiera destinație'}
               </p>
             </div>
 
@@ -194,7 +194,7 @@ const ServiceTransfer = () => {
                   10
                 </div>
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-                  Liters to Transfer
+                  Litri de Transferat
                 </div>
               </div>
             </div>
@@ -205,7 +205,7 @@ const ServiceTransfer = () => {
               disabled={!selectedRecipe || !selectedSlot || isTransferring}
               className="w-full py-4 rounded-xl bg-gradient-to-b from-orange-600 to-orange-700 text-white font-manrope font-bold text-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isTransferring ? 'Processing...' : 'Execute Transfer'}
+              {isTransferring ? 'Se procesează...' : 'Execută Transferul'}
               {!isTransferring && (
                 <span className="material-symbols-outlined group-hover/btn:translate-x-1 transition-transform">
                   arrow_forward
@@ -219,7 +219,7 @@ const ServiceTransfer = () => {
         <section className="lg:col-span-4 flex flex-col max-h-[800px]">
           <h3 className="font-manrope text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <span className="material-symbols-outlined text-orange-500">heat_pump</span>
-            Serving Area
+            Zonă Servire
           </h3>
           <div className="bg-white rounded-xl p-4 flex-1 overflow-y-auto space-y-4 border border-slate-200 shadow-sm">
             {servingSlots.map((slot) => {
@@ -243,14 +243,14 @@ const ServiceTransfer = () => {
                           </h4>
                         </div>
                         <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded">
-                          Occupied
+                          Ocupată
                         </span>
                       </div>
                       <div className="flex justify-between items-end mb-2">
                         <div>
                           <p className="font-medium text-slate-900 text-sm">{slot.recipe_name}</p>
                           <p className="text-xs text-slate-500 mt-1">
-                            Filled:{' '}
+                            Umplută la:{' '}
                             {new Date(slot.last_filled_at).toLocaleTimeString([], {
                               hour: '2-digit',
                               minute: '2-digit',
@@ -268,7 +268,7 @@ const ServiceTransfer = () => {
                       className="w-full py-2 bg-white hover:bg-red-50 text-red-600 border border-slate-200 hover:border-red-200 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm"
                     >
                       <span className="material-symbols-outlined text-[18px]">delete</span>
-                      Empty Pan
+                      Golește Supiera
                     </button>
                   </div>
                 );
@@ -302,7 +302,7 @@ const ServiceTransfer = () => {
                   <p
                     className={`text-xs mt-1 ${isSelected ? 'text-orange-600' : 'text-slate-400'}`}
                   >
-                    Empty Slot
+                    Slot Liber
                   </p>
                 </div>
               );

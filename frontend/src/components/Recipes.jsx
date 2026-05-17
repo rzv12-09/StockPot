@@ -44,7 +44,7 @@ const Recipes = () => {
       (item) => item.ingredient_id === Number(currentIngredientId)
     );
     if (alreadyExists) {
-      alert('This ingredient is already in the recipe!');
+      alert('Acest ingredient există deja în rețetă!');
       return;
     }
 
@@ -77,7 +77,7 @@ const Recipes = () => {
   const handleSubmitRecipe = async (e) => {
     e.preventDefault();
     if (selectedIngredients.length === 0) {
-      alert('Please add at least one ingredient to the recipe.');
+      alert('Te rugăm să adaugi cel puțin un ingredient în rețetă.');
       return;
     }
     try {
@@ -105,7 +105,7 @@ const Recipes = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this recipe?')) return;
+    if (!window.confirm('Ești sigur că vrei să ștergi această rețetă?')) return;
     try {
       await deleteRecipe(id);
       if (selectedRecipe && selectedRecipe.id === id) {
@@ -130,7 +130,7 @@ const Recipes = () => {
   );
 
   if (isLoading)
-    return <div className="text-slate-500 font-body p-8">Loading recipe atelier...</div>;
+    return <div className="text-slate-500 font-body p-8">Se încarcă rețetarul...</div>;
 
   return (
     <div className="flex-1 flex flex-col lg:flex-row gap-8 overflow-hidden h-[calc(100vh-8rem)]">
@@ -138,11 +138,11 @@ const Recipes = () => {
       <section className="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-slate-50 border border-slate-200 rounded-xl p-4 overflow-hidden h-full min-h-[500px] shadow-sm">
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="font-manrope text-2xl font-bold text-slate-900">Recipe Vault</h2>
+            <h2 className="font-manrope text-2xl font-bold text-slate-900">Lista de Rețete</h2>
             <button
               onClick={() => handleSelectRecipe(null)}
               className="w-8 h-8 flex items-center justify-center bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
-              title="Create New Recipe"
+              title="Creează Rețetă Nouă"
             >
               <span className="material-symbols-outlined text-[20px]">add</span>
             </button>
@@ -156,7 +156,7 @@ const Recipes = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white border border-slate-200 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors outline-none"
-              placeholder="Filter recipes..."
+              placeholder="Filtrează rețete..."
             />
           </div>
         </div>
@@ -186,7 +186,7 @@ const Recipes = () => {
                     {recipe.name}
                   </span>
                   <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full uppercase shrink-0">
-                    {recipe.ingredients.length} Ing
+                    {recipe.ingredients.length} Ing.
                   </span>
                 </div>
                 {recipe.description && (
@@ -198,7 +198,7 @@ const Recipes = () => {
             );
           })}
           {filteredRecipes.length === 0 && (
-            <div className="text-center text-sm text-slate-400 mt-8">No recipes found.</div>
+            <div className="text-center text-sm text-slate-400 mt-8">Nicio rețetă găsită.</div>
           )}
         </div>
       </section>
@@ -214,10 +214,10 @@ const Recipes = () => {
             <div className="flex items-center gap-3 mb-1">
               <span className="text-xs font-bold tracking-wider uppercase text-orange-700 bg-orange-100 px-2.5 py-1 rounded-sm">
                 {selectedRecipe
-                  ? 'Active Recipe'
+                  ? 'Rețetă Activă'
                   : editingRecipeId
-                  ? 'Editing Recipe'
-                  : 'New Draft'}
+                  ? 'Editare Rețetă'
+                  : 'Rețetă Nouă'}
               </span>
             </div>
 
@@ -227,7 +227,7 @@ const Recipes = () => {
                   {selectedRecipe.name}
                 </h1>
                 <p className="text-slate-600 text-sm mt-1 max-w-xl">
-                  {selectedRecipe.description || 'No description provided.'}
+                  {selectedRecipe.description || 'Nicio descriere adăugată.'}
                 </p>
               </>
             ) : (
@@ -237,7 +237,7 @@ const Recipes = () => {
                   type="text"
                   value={recipeName}
                   onChange={(e) => setRecipeName(e.target.value)}
-                  placeholder="Enter Recipe Name..."
+                  placeholder="Introdu Numele Rețetei..."
                   className="font-manrope text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-300 outline-none w-full truncate"
                 />
                 {/* Textarea în loc de input pentru a forța textul lung pe mai multe rânduri */}
@@ -245,7 +245,7 @@ const Recipes = () => {
                   rows="2"
                   value={recipeDescription}
                   onChange={(e) => setRecipeDescription(e.target.value)}
-                  placeholder="Add a brief description..."
+                  placeholder="Adaugă o scurtă descriere..."
                   className="text-slate-600 text-sm mt-1 max-w-xl bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-400 outline-none w-full resize-none"
                 />
               </>
@@ -259,7 +259,7 @@ const Recipes = () => {
                 onClick={handleEditClick}
                 className="bg-gradient-to-b from-orange-600 to-orange-700 text-white px-6 py-2 rounded-md font-semibold text-sm shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2 whitespace-nowrap"
               >
-                <span className="material-symbols-outlined text-[18px]">edit</span> Edit Recipe
+                <span className="material-symbols-outlined text-[18px]">edit</span> Editează Rețeta
               </button>
             </div>
           )}
@@ -271,19 +271,19 @@ const Recipes = () => {
           <div className="xl:col-span-2 bg-white rounded-xl p-8 shadow-sm border border-slate-200 flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-manrope text-xl font-bold text-slate-900">
-                Standard Batch Ingredients
+                Ingrediente pentru o Șarjă
               </h3>
               <span className="text-xs font-bold text-orange-700 bg-orange-100 px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">
-                Yield: 50 L
+                Producție: 50 L
               </span>
             </div>
 
             {/* Table Headers */}
             <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-slate-50 rounded-t-md text-xs font-bold text-slate-500 uppercase tracking-wider">
-              <div className="col-span-6">Ingredient Name</div>
-              <div className="col-span-2 text-right">Quantity</div>
-              <div className="col-span-2">Unit</div>
-              <div className="col-span-2 text-right">Action</div>
+              <div className="col-span-6">Nume Ingredient</div>
+              <div className="col-span-2 text-right">Cantitate</div>
+              <div className="col-span-2">U.M.</div>
+              <div className="col-span-2 text-right">Acțiune</div>
             </div>
 
             {/* Table Body */}
@@ -322,7 +322,7 @@ const Recipes = () => {
 
               {!selectedRecipe && selectedIngredients.length === 0 && (
                 <div className="py-8 text-center text-sm text-slate-400">
-                  No ingredients added yet.
+                  Niciun ingredient adăugat.
                 </div>
               )}
             </div>
@@ -331,7 +331,7 @@ const Recipes = () => {
             {!selectedRecipe && (
               <div className="mt-8 pt-6 relative border-t border-slate-100">
                 <label className="text-xs font-bold text-slate-500 mb-2 block uppercase tracking-wider">
-                  Add Ingredient from Nomenclature
+                  Adaugă Ingredient din Nomenclator
                 </label>
                 <div className="flex gap-4">
                   <div className="relative flex-1">
@@ -340,7 +340,7 @@ const Recipes = () => {
                       onChange={(e) => setCurrentIngredientId(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 rounded-lg px-4 py-3 text-sm text-slate-900 outline-none transition-colors"
                     >
-                      <option value="">-- Select Ingredient --</option>
+                      <option value="">-- Selectează Ingredient --</option>
                       {availableIngredients.map((ing) => (
                         <option key={ing.id} value={ing.id}>
                           {ing.name} ({ing.unit_of_measure})
@@ -350,7 +350,7 @@ const Recipes = () => {
                   </div>
                   <input
                     type="number"
-                    placeholder="Qty"
+                    placeholder="Cant."
                     value={currentQuantity}
                     onChange={(e) => setCurrentQuantity(e.target.value)}
                     step="0.01"
@@ -360,7 +360,7 @@ const Recipes = () => {
                     onClick={handleAddIngredientToRecipe}
                     className="bg-slate-100 text-slate-700 px-6 py-2 rounded-lg font-bold text-sm hover:bg-orange-100 hover:text-orange-700 transition-colors"
                   >
-                    Add
+                    Adaugă
                   </button>
                 </div>
               </div>
@@ -373,19 +373,19 @@ const Recipes = () => {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col h-full">
               <h3 className="font-manrope text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-orange-600">menu_book</span>
-                Chef's Notes
+                Notițele Bucătarului
               </h3>
               <div className="flex-1 min-h-[200px] bg-slate-50 rounded-lg p-4 border border-slate-100">
                 {selectedRecipe ? (
                   <p className="text-sm text-slate-600 whitespace-pre-wrap">
-                    {selectedRecipe.description || 'No special instructions recorded.'}
+                    {selectedRecipe.description || 'Fără instrucțiuni speciale.'}
                   </p>
                 ) : (
                   <textarea
                     value={recipeDescription}
                     onChange={(e) => setRecipeDescription(e.target.value)}
                     className="w-full h-full bg-transparent border-none focus:ring-0 p-0 text-sm text-slate-900 placeholder:text-slate-400 resize-none outline-none leading-relaxed"
-                    placeholder="Enter production instructions, critical control points, or garnishing notes here..."
+                    placeholder="Introdu instrucțiuni de producție sau note pentru garnitură..."
                   />
                 )}
               </div>
@@ -394,7 +394,7 @@ const Recipes = () => {
             {/* Action Card (Publishing) */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col">
               <h3 className="font-manrope text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">
-                RECIPE INFO
+                INFORMAȚII REȚETĂ
               </h3>
               <div className="flex flex-col gap-4">
                 {selectedRecipe ? (
@@ -402,7 +402,7 @@ const Recipes = () => {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-500">Status</span>
                       <span className="font-bold text-teal-700 flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-teal-500"></span> Active
+                        <span className="w-2 h-2 rounded-full bg-teal-500"></span> Activă
                       </span>
                     </div>
                     <div className="h-px bg-slate-100 my-2"></div>
@@ -410,7 +410,7 @@ const Recipes = () => {
                       onClick={() => handleDelete(selectedRecipe.id)}
                       className="w-full bg-red-50 text-red-600 hover:bg-red-100 py-3 rounded-lg font-bold text-sm transition-colors mt-2"
                     >
-                      Delete Recipe
+                      Șterge Rețeta
                     </button>
                   </>
                 ) : (
@@ -419,7 +419,7 @@ const Recipes = () => {
                       <span className="text-slate-500">Status</span>
                       <span className="font-bold text-orange-600 flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>{' '}
-                        {editingRecipeId ? 'Editing' : 'Drafting'}
+                        {editingRecipeId ? 'În Editare' : 'Nouă'}
                       </span>
                     </div>
                     <div className="h-px bg-slate-100 my-2"></div>
@@ -428,7 +428,7 @@ const Recipes = () => {
                       className="w-full bg-gradient-to-b from-orange-600 to-orange-700 text-white py-3 rounded-lg font-bold text-sm shadow-md hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
                     >
                       <span className="material-symbols-outlined text-[18px]">save</span>
-                      {editingRecipeId ? 'Update Recipe' : 'Save Changes'}
+                      {editingRecipeId ? 'Actualizează Rețeta' : 'Salvează Rețeta'}
                     </button>
                     {/* Buton de Cancel Edit */}
                     {editingRecipeId && (
@@ -436,7 +436,7 @@ const Recipes = () => {
                         onClick={() => handleSelectRecipe(null)}
                         className="w-full bg-slate-100 text-slate-600 hover:bg-slate-200 py-3 rounded-lg font-bold text-sm transition-colors mt-2"
                       >
-                        Cancel Edit
+                        Anulează
                       </button>
                     )}
                   </>

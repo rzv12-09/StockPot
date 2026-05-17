@@ -87,18 +87,18 @@ const Invoices = () => {
       }
 
       if (!finalSupplierId || finalSupplierId === 'NEW') {
-        alert('Please select or create a supplier.');
+        alert('Te rugăm să selectezi sau să creezi un furnizor.');
         return;
       }
 
       if (!invoiceNumber || !issueDate) {
-        alert('Please fill in all invoice details.');
+        alert('Te rugăm să completezi toate detaliile facturii.');
         return;
       }
 
       const validItems = items.filter(item => item.ingredient_id && item.quantity && item.unit_price);
       if (validItems.length === 0) {
-        alert('Please add at least one valid item.');
+        alert('Te rugăm să adaugi cel puțin un articol valid.');
         return;
       }
 
@@ -125,22 +125,22 @@ const Invoices = () => {
       loadData();
 
     } catch (err) {
-      alert(err.message || 'Failed to save invoice.');
+      alert(err.message || 'Salvarea facturii a eșuat.');
     }
   };
 
   const handleDeleteInvoice = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this invoice? Related items will also be deleted, but stock WILL NOT be reverted automatically.')) return;
+    if (!window.confirm('Ești sigur că vrei să ștergi această factură? Articolele aferente vor fi de asemenea șterse, dar stocul NU va fi modificat automat.')) return;
     try {
       await deleteInvoice(id);
       loadData();
     } catch (err) {
-      alert(err.message || 'Failed to delete invoice');
+      alert(err.message || 'Ștergerea facturii a eșuat.');
     }
   };
 
   if (isLoading) {
-    return <div className="text-slate-500 p-8">Loading invoices...</div>;
+    return <div className="text-slate-500 p-8">Se încarcă facturile...</div>;
   }
 
   // LIST VIEW
@@ -190,7 +190,7 @@ const Invoices = () => {
                     <button
                       onClick={() => handleDeleteInvoice(inv.id)}
                       className="w-8 h-8 rounded-md bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-400 flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
-                      title="Delete Invoice"
+                      title="Șterge Factura"
                     >
                       <span className="material-symbols-outlined text-[18px]">delete</span>
                     </button>
@@ -353,7 +353,7 @@ const Invoices = () => {
                           <button 
                             onClick={() => handleRemoveItem(item.id)}
                             className="text-slate-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50" 
-                            title="Remove item"
+                            title="Șterge articolul"
                             disabled={items.length === 1}
                           >
                             <span className="material-symbols-outlined text-[20px]">delete</span>

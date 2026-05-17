@@ -10,7 +10,8 @@ const Ingredients = () => {
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('All Categories');
+  const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('Toate Categoriile');
 
   // State pentru Modal
   const [showForm, setShowForm] = useState(false);
@@ -107,7 +108,7 @@ const Ingredients = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this ingredient?')) return;
+    if (!window.confirm('Ești sigur că vrei să ștergi acest ingredient?')) return;
     try {
       await deleteIngredient(id);
       loadIngredients();
@@ -116,12 +117,13 @@ const Ingredients = () => {
     }
   };
 
-  if (isLoading) return <div className="text-slate-500 font-body">Loading ingredients...</div>;
-  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (isLoading) return <div className="text-slate-500 font-body">Se încarcă ingredientele...</div>;
+  if (error) return <div className="text-red-500">Eroare: {error}</div>;
 
   // Filtrăm lista bazat pe categoria selectată
   const filteredIngredients =
-    selectedCategory === 'All Categories'
+  const filteredIngredients =
+    selectedCategory === 'Toate Categoriile'
       ? ingredients
       : ingredients.filter((ing) => ing.category === selectedCategory);
 
@@ -137,10 +139,10 @@ const Ingredients = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
           <h2 className="font-manrope text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-            Inventory Management
+            Gestiune Ingrediente
           </h2>
           <p className="font-body text-slate-500 text-sm max-w-2xl">
-            Manage your ingredients and stock levels.
+            Gestionează ingredientele și nivelul stocurilor.
           </p>
         </div>
         <button
@@ -153,22 +155,23 @@ const Ingredients = () => {
           >
             add
           </span>
-          Add New Ingredient
+          Adaugă Ingredient Nou
         </button>
       </div>
 
       {/* Stats/Filter Row */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
         <div className="md:col-span-8 flex gap-4">
+        <div className="md:col-span-8 flex gap-4">
           <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1 transition-all">
-            <p className="font-body text-sm font-semibold text-slate-500 mb-1">Total Ingredients</p>
+            <p className="font-body text-sm font-semibold text-slate-500 mb-1">Total Ingrediente</p>
             <div className="text-2xl font-manrope font-bold text-orange-600">{totalItems}</div>
           </div>
           {lowStockItems > 0 ? (
             <div className="bg-red-50 border border-red-100 rounded-xl p-6 flex-1 relative overflow-hidden transition-all shadow-sm">
               <div className="absolute right-0 top-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
               <p className="font-body text-sm font-semibold text-red-800 mb-1 relative z-10">
-                Low Stock Alerts
+                Alerte Stoc Scăzut
               </p>
               <div className="flex items-center gap-2 relative z-10">
                 <div className="text-2xl font-manrope font-bold text-red-600">{lowStockItems}</div>
@@ -177,8 +180,9 @@ const Ingredients = () => {
             </div>
           ) : (
             <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1 transition-all">
+            <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex-1 transition-all">
               <p className="font-body text-sm font-semibold text-slate-500 mb-1">
-                Low Stock Alerts
+                Alerte Stoc Scăzut
               </p>
               <div className="flex items-center gap-2">
                 <div className="text-2xl font-manrope font-bold text-slate-300">0</div>
@@ -191,20 +195,21 @@ const Ingredients = () => {
         </div>
         <div className="md:col-span-4 bg-slate-100 rounded-xl p-6 flex flex-col justify-center">
           <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
-            Quick Filter
+          <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
+            Filtru Rapid
           </label>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="w-full bg-white border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20 cursor-pointer"
           >
-            <option value="All Categories">All Categories</option>
-            <option value="Vegetables">Vegetables</option>
-            <option value="Meat & Poultry">Meat & Poultry</option>
-            <option value="Dairy & Eggs">Dairy & Eggs</option>
-            <option value="Dry Goods">Dry Goods</option>
-            <option value="Spices & Herbs">Spices & Herbs</option>
-            <option value="Liquids">Liquids</option>
+            <option value="Toate Categoriile">Toate Categoriile</option>
+            <option value="Vegetables">Legume</option>
+            <option value="Meat & Poultry">Carne și Pui</option>
+            <option value="Dairy & Eggs">Lactate și Ouă</option>
+            <option value="Dry Goods">Produse Uscate</option>
+            <option value="Spices & Herbs">Condimente și Ierburi</option>
+            <option value="Liquids">Lichide</option>
             <option value="General">General</option>
           </select>
         </div>
@@ -215,19 +220,19 @@ const Ingredients = () => {
         <div className="w-full text-left font-body">
           <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 border-b border-slate-100 rounded-t-xl mb-2">
             <div className="col-span-4 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Ingredient Name
+              Nume Ingredient
             </div>
             <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Unit
+              U.M.
             </div>
             <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Current Stock
+              Stoc Curent
             </div>
             <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Min. Alert
+              Limită Alertă
             </div>
             <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
-              Actions
+              Acțiuni
             </div>
           </div>
 
@@ -295,14 +300,14 @@ const Ingredients = () => {
                     <button
                       onClick={() => handleEditClick(ingredient)}
                       className="w-8 h-8 rounded-md bg-slate-100 hover:bg-orange-100 hover:text-orange-600 text-slate-600 flex items-center justify-center transition-colors"
-                      title="Edit"
+                      title="Editează"
                     >
                       <span className="material-symbols-outlined text-[18px]">edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(ingredient.id)}
                       className="w-8 h-8 rounded-md bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-600 flex items-center justify-center transition-colors"
-                      title="Delete"
+                      title="Șterge"
                     >
                       <span className="material-symbols-outlined text-[18px]">delete</span>
                     </button>
@@ -313,7 +318,7 @@ const Ingredients = () => {
 
             {filteredIngredients.length === 0 && (
               <div className="text-center py-8 text-slate-500 font-medium">
-                No ingredients found in this category.
+                Niciun ingredient găsit în această categorie.
               </div>
             )}
           </div>
@@ -330,12 +335,12 @@ const Ingredients = () => {
               <div>
                 {/* NOU: Titlu dinamic */}
                 <h2 className="font-manrope text-2xl font-bold text-slate-900">
-                  {editingIngredientId ? 'Edit Ingredient' : 'Add New Ingredient'}
+                  {editingIngredientId ? 'Editează Ingredient' : 'Adaugă Ingredient Nou'}
                 </h2>
                 <p className="font-body text-sm text-slate-500 mt-1">
                   {editingIngredientId
-                    ? 'Update details for inventory tracking.'
-                    : 'Enter the details for the new inventory item.'}
+                    ? 'Actualizează detaliile pentru monitorizarea inventarului.'
+                    : 'Introdu detaliile pentru noul articol din stoc.'}
                 </p>
               </div>
               <button
@@ -358,7 +363,7 @@ const Ingredients = () => {
                     className="block font-body text-sm font-semibold text-slate-700 mb-2"
                     htmlFor="name"
                   >
-                    Ingredient Name
+                    Nume Ingredient
                   </label>
                   <input
                     required
@@ -366,7 +371,7 @@ const Ingredients = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder="e.g., Organic Carrots"
+                    placeholder="ex., Morcovi organici"
                     type="text"
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-slate-900 font-body text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all"
                   />
@@ -379,7 +384,7 @@ const Ingredients = () => {
                       className="block font-body text-sm font-semibold text-slate-700 mb-2"
                       htmlFor="category"
                     >
-                      Category
+                      Categorie
                     </label>
                     <div className="relative">
                       <select
@@ -391,14 +396,14 @@ const Ingredients = () => {
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pl-4 pr-10 text-slate-900 font-body text-sm appearance-none focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all cursor-pointer"
                       >
                         <option disabled value="">
-                          Select category
+                          Selectează categoria
                         </option>
-                        <option value="Vegetables">Vegetables</option>
-                        <option value="Meat & Poultry">Meat & Poultry</option>
-                        <option value="Dairy & Eggs">Dairy & Eggs</option>
-                        <option value="Dry Goods">Dry Goods</option>
-                        <option value="Spices & Herbs">Spices & Herbs</option>
-                        <option value="Liquids">Liquids</option>
+                        <option value="Vegetables">Legume</option>
+                        <option value="Meat & Poultry">Carne și Pui</option>
+                        <option value="Dairy & Eggs">Lactate și Ouă</option>
+                        <option value="Dry Goods">Produse Uscate</option>
+                        <option value="Spices & Herbs">Condimente și Ierburi</option>
+                        <option value="Liquids">Lichide</option>
                         <option value="General">General</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
@@ -413,7 +418,7 @@ const Ingredients = () => {
                       className="block font-body text-sm font-semibold text-slate-700 mb-2"
                       htmlFor="unit_of_measure"
                     >
-                      Unit of Measure
+                      Unitate de Măsură
                     </label>
                     <div className="relative">
                       <select
@@ -425,14 +430,14 @@ const Ingredients = () => {
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pl-4 pr-10 text-slate-900 font-body text-sm appearance-none focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all cursor-pointer"
                       >
                         <option disabled value="">
-                          Select unit
+                          Selectează unitatea
                         </option>
-                        <option value="kg">kg (Kilograms)</option>
-                        <option value="g">g (Grams)</option>
-                        <option value="L">L (Liters)</option>
-                        <option value="ml">ml (Milliliters)</option>
-                        <option value="units">Units / Pieces</option>
-                        <option value="bunch">Bunch</option>
+                        <option value="kg">kg (Kilograme)</option>
+                        <option value="g">g (Grame)</option>
+                        <option value="L">L (Litri)</option>
+                        <option value="ml">ml (Mililitri)</option>
+                        <option value="units">Bucăți / Unitate</option>
+                        <option value="bunch">Legătură</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                         <span className="material-symbols-outlined">expand_more</span>
@@ -448,7 +453,7 @@ const Ingredients = () => {
                       className="block font-body text-sm font-semibold text-slate-700 mb-2"
                       htmlFor="current_stock"
                     >
-                      Current Stock
+                      Stoc Curent
                     </label>
                     <input
                       required
@@ -470,7 +475,7 @@ const Ingredients = () => {
                       className="block font-body text-sm font-semibold text-slate-700 mb-2"
                       htmlFor="alert_threshold"
                     >
-                      Min. Alert Threshold
+                      Limită Alertă Minimă
                     </label>
                     <input
                       required
@@ -485,7 +490,7 @@ const Ingredients = () => {
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-slate-900 font-body text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all"
                     />
                     <p className="text-xs text-slate-500 mt-1 ml-1 font-body">
-                      Notify when stock falls below this level.
+                      Te notifică când stocul scade sub acest nivel.
                     </p>
                   </div>
                 </div>
@@ -502,7 +507,7 @@ const Ingredients = () => {
                 className="px-6 py-2.5 font-body text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors focus:outline-none"
                 type="button"
               >
-                Cancel
+                Anulează
               </button>
               {/* NOU: Buton dinamic și design similar cu referința pentru Edit */}
               <button
@@ -516,7 +521,7 @@ const Ingredients = () => {
                 >
                   {editingIngredientId ? 'save' : 'add'}
                 </span>
-                {editingIngredientId ? 'Save Changes' : 'Add Ingredient'}
+                {editingIngredientId ? 'Salvează Modificările' : 'Adaugă Ingredient'}
               </button>
             </div>
           </div>

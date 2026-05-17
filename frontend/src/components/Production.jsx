@@ -27,7 +27,7 @@ const Production = () => {
       setRecipes(recipesData);
       if (recipesData.length > 0) setSelectedRecipe(recipesData[0].id);
     } catch (err) {
-      setError('Failed to load data. ' + err.message);
+      setError('Încărcarea datelor a eșuat. ' + err.message);
     }
   };
 
@@ -66,8 +66,7 @@ const Production = () => {
         recipe_id: selectedRecipe,
         quantity_produced: quantity,
       });
-      // Confirmare vizuală pentru câți Litri au ajuns efectiv în frigider
-      setSuccess(`Production batch recorded! Added ${quantity * 50} Liters to inventory.`);
+      setSuccess(`Șarjă de producție înregistrată! S-au adăugat ${quantity * 50} Litri în inventar.`);
       setQuantity(1); // Resetăm cantitatea
     } catch (err) {
       setError(err.message);
@@ -81,10 +80,10 @@ const Production = () => {
       {/* Header Pagină */}
       <div className="mb-8">
         <h2 className="font-manrope text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-          Daily Production
+          Producție Zilnică
         </h2>
         <p className="font-body text-slate-500 text-sm max-w-2xl">
-          Select recipes and batch quantities to deduct ingredients from inventory.
+          Selectează rețetele și cantitățile pentru a deduce ingredientele din inventar.
         </p>
       </div>
 
@@ -108,12 +107,12 @@ const Production = () => {
               <span className="material-symbols-outlined text-orange-600 text-[22px]">
                 restaurant_menu
               </span>
-              Recipe Configuration
+              Configurare Rețetă
             </h3>
             <div className="space-y-6">
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider font-manrope">
-                  Select Recipe
+                  Selectează Rețeta
                 </label>
                 <div className="relative">
                   <select
@@ -135,7 +134,7 @@ const Production = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider font-manrope">
-                    Batch Quantity
+                    Număr Șarje
                   </label>
                   <input
                     type="number"
@@ -147,11 +146,11 @@ const Production = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider font-manrope">
-                    Quantity Produced
+                    Cantitate Produsă
                   </label>
                   <div className="w-full bg-slate-100 rounded-lg py-3 px-4 text-slate-900 text-center text-xl font-bold font-manrope">
                     {quantity * 50}{' '}
-                    <span className="text-sm font-normal text-slate-500 font-body">Liters</span>
+                    <span className="text-sm font-normal text-slate-500 font-body">Litri</span>
                   </div>
                 </div>
               </div>
@@ -163,10 +162,10 @@ const Production = () => {
         <div className="lg:col-span-5">
           <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 sticky top-24">
             <h3 className="font-manrope text-lg font-bold mb-1 text-slate-900">
-              Stock Deduction Preview
+              Previzualizare Deducere Stoc
             </h3>
             <p className="font-body text-slate-500 text-sm mb-6 pb-4 border-b border-slate-100">
-              Review ingredients before confirming.
+              Revizuiește ingredientele înainte de a confirma.
             </p>
 
             {/* Listă Dinamică Ingrediente */}
@@ -177,7 +176,7 @@ const Production = () => {
                 </div>
               ) : previewData.length === 0 ? (
                 <p className="text-center text-sm text-slate-400 py-4 font-body">
-                  No ingredients required for this recipe.
+                  Niciun ingredient necesar pentru această rețetă.
                 </p>
               ) : (
                 previewData.map((item, index) => {
@@ -204,7 +203,7 @@ const Production = () => {
                             {item.ingredient_name}
                           </p>
                           <p className="text-xs text-slate-500 font-body">
-                            Current: {item.current_stock}
+                            Curent: {item.current_stock}
                           </p>
                         </div>
                       </div>
@@ -223,7 +222,7 @@ const Production = () => {
                               : 'text-slate-300 group-hover:text-slate-500'
                           }`}
                         >
-                          New: {item.projected_stock}
+                          Nou: {item.projected_stock}
                         </p>
                       </div>
                     </div>
@@ -236,7 +235,7 @@ const Production = () => {
             {!canProduce && !isPreviewLoading && previewData.length > 0 && (
               <div className="mb-4 bg-red-50 text-red-600 text-xs font-medium p-3 rounded-lg border border-red-100 flex items-center gap-2">
                 <span className="material-symbols-outlined text-[16px]">warning</span>
-                Insufficient stock for one or more ingredients!
+                Stoc insuficient pentru unul sau mai multe ingrediente!
               </div>
             )}
 
@@ -256,10 +255,10 @@ const Production = () => {
                     {canProduce ? 'check_circle' : 'block'}
                   </span>
                 )}
-                {isLoading ? 'Processing...' : 'Confirm Production'}
+                {isLoading ? 'Se procesează...' : 'Confirmă Producția'}
               </button>
               <p className="text-center text-xs text-slate-400 mt-3 font-body">
-                This action will immediately update ingredient inventory.
+                Această acțiune va actualiza imediat inventarul ingredientelor.
               </p>
             </div>
           </div>

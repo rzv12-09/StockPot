@@ -23,10 +23,16 @@ export const getInvoiceById = async (id) => {
 };
 
 export const createInvoice = async (invoiceData) => {
+  const isFormData = invoiceData instanceof FormData;
+  const headers = getAuthHeaders();
+  if (isFormData) {
+    delete headers['Content-Type'];
+  }
+
   const response = await fetch(`${baseUrl}/api/invoices`, {
     method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(invoiceData),
+    headers,
+    body: isFormData ? invoiceData : JSON.stringify(invoiceData),
   });
   if (!response.ok) {
     const err = await response.json();

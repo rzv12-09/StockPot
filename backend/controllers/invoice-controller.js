@@ -11,6 +11,7 @@ const getInvoices = async (req, res) => {
         i.total_amount, 
         i.notes, 
         i.created_at,
+        i.image_url,
         s.name AS supplier_name,
         s.id AS supplier_id,
         (SELECT COUNT(*) FROM InvoiceItem ii WHERE ii.invoice_id = i.id) AS item_count
@@ -66,8 +67,16 @@ const createInvoice = async (req, res) => {
   const client = await db.connect();
 
   try {
-    const { supplier_id, invoice_number, issue_date, notes, items } = req.body;
+    let items;
+    try {
+      items = typeof req.body.items === 'string' ? JSON.parse(req.body.items) : req.body.items;
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid items format' });
+    }
+
+    const { supplier_id, invoice_number, issue_date, notes } = req.body;
     const created_by = req.user?.userId || null;
+    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
     if (!supplier_id || !invoice_number || !issue_date || !items || items.length === 0) {
       return res.status(400).json({
@@ -85,10 +94,10 @@ const createInvoice = async (req, res) => {
 
     // Insert invoice header
     const invoiceResult = await client.query(
-      `INSERT INTO Invoice (supplier_id, invoice_number, issue_date, total_amount, notes, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO Invoice (supplier_id, invoice_number, issue_date, total_amount, notes, created_by, image_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [supplier_id, invoice_number, issue_date, total_amount, notes || null, created_by]
+      [supplier_id, invoice_number, issue_date, total_amount, notes || null, created_by, image_url]
     );
 
     const invoiceId = invoiceResult.rows[0].id;

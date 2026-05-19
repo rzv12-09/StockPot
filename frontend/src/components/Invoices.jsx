@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   getInvoices,
+  getInvoiceById,
   createInvoice,
   deleteInvoice,
   getSuppliers,
@@ -22,9 +23,14 @@ const Invoices = () => {
   const [newSupplierName, setNewSupplierName] = useState(''); // for quick create
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [issueDate, setIssueDate] = useState(new Date().toISOString().split('T')[0]);
+  const [imageFile, setImageFile] = useState(null);
   const [items, setItems] = useState([
     { id: Date.now(), ingredient_id: '', quantity: '', unit_price: '' }
   ]);
+
+  const [expandedInvoiceId, setExpandedInvoiceId] = useState(null);
+  const [expandedInvoiceData, setExpandedInvoiceData] = useState(null);
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const TVA_RATE = 0.11; // 11% TVA
 
@@ -75,6 +81,24 @@ const Invoices = () => {
     }, 0);
   };
 
+  const handleExpandRow = async (invId) => {
+    if (expandedInvoiceId === invId) {
+      setExpandedInvoiceId(null);
+      setExpandedInvoiceData(null);
+      return;
+    }
+    
+    setExpandedInvoiceId(invId);
+    setExpandedInvoiceData(null); 
+    try {
+      const data = await getInvoiceById(invId);
+      setExpandedInvoiceData(data);
+    } catch (error) {
+      console.error('Error fetching invoice details:', error);
+      alert('Eroare la încărcarea detaliilor facturii.');
+    }
+  };
+
   const handleSaveInvoice = async () => {
     try {
       let finalSupplierId = supplierId;
@@ -102,16 +126,32 @@ const Invoices = () => {
         return;
       }
 
-      const payload = {
-        supplier_id: finalSupplierId,
-        invoice_number: invoiceNumber,
-        issue_date: issueDate,
-        items: validItems.map(item => ({
-          ingredient_id: item.ingredient_id,
-          quantity: parseFloat(item.quantity),
-          unit_price: parseFloat(item.unit_price)
-        }))
-      };
+      let payload;
+      if (imageFile) {
+        payload = new FormData();
+        payload.append('supplier_id', finalSupplierId);
+        payload.append('invoice_number', invoiceNumber);
+        payload.append('issue_date', issueDate);
+        payload.append('image', imageFile);
+        payload.append('items', JSON.stringify(
+          validItems.map(item => ({
+            ingredient_id: item.ingredient_id,
+            quantity: parseFloat(item.quantity),
+            unit_price: parseFloat(item.unit_price)
+          }))
+        ));
+      } else {
+        payload = {
+          supplier_id: finalSupplierId,
+          invoice_number: invoiceNumber,
+          issue_date: issueDate,
+          items: validItems.map(item => ({
+            ingredient_id: item.ingredient_id,
+            quantity: parseFloat(item.quantity),
+            unit_price: parseFloat(item.unit_price)
+          }))
+        };
+      }
 
       await createInvoice(payload);
       
@@ -120,6 +160,7 @@ const Invoices = () => {
       setNewSupplierName('');
       setInvoiceNumber('');
       setIssueDate(new Date().toISOString().split('T')[0]);
+      setImageFile(null);
       setItems([{ id: Date.now(), ingredient_id: '', quantity: '', unit_price: '' }]);
       setView('list');
       loadData();
@@ -180,22 +221,81 @@ const Invoices = () => {
 
             <div className="space-y-1 px-2">
               {invoices.map((inv) => (
-                <div key={inv.id} className="grid grid-cols-12 gap-4 px-4 py-4 rounded-lg items-center hover:bg-slate-50 transition-colors group">
-                  <div className="col-span-3 font-semibold text-sm text-slate-800">{inv.supplier_name}</div>
-                  <div className="col-span-2 text-sm text-slate-600">{inv.invoice_number}</div>
-                  <div className="col-span-2 text-sm text-slate-600">{new Date(inv.issue_date).toLocaleDateString()}</div>
-                  <div className="col-span-2 text-sm text-slate-600 text-right">{inv.item_count}</div>
-                  <div className="col-span-2 text-sm font-bold text-orange-700 text-right">{Number(inv.total_amount).toFixed(2)}</div>
-                  <div className="col-span-1 flex justify-end">
-                    <button
-                      onClick={() => handleDeleteInvoice(inv.id)}
-                      className="w-8 h-8 rounded-md bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-400 flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
-                      title="Șterge Factura"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">delete</span>
-                    </button>
+                <React.Fragment key={inv.id}>
+                  <div 
+                    onClick={() => handleExpandRow(inv.id)}
+                    className="grid grid-cols-12 gap-4 px-4 py-4 rounded-lg items-center hover:bg-slate-50 transition-colors group cursor-pointer"
+                  >
+                    <div className="col-span-3 font-semibold text-sm text-slate-800">{inv.supplier_name}</div>
+                    <div className="col-span-2 text-sm text-slate-600">{inv.invoice_number}</div>
+                    <div className="col-span-2 text-sm text-slate-600">{new Date(inv.issue_date).toLocaleDateString()}</div>
+                    <div className="col-span-2 text-sm text-slate-600 text-right">{inv.item_count}</div>
+                    <div className="col-span-2 text-sm font-bold text-orange-700 text-right">{Number(inv.total_amount).toFixed(2)}</div>
+                    <div className="col-span-1 flex justify-end">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeleteInvoice(inv.id); }}
+                        className="w-8 h-8 rounded-md bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-400 flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
+                        title="Șterge Factura"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                  {expandedInvoiceId === inv.id && (
+                    <div className="col-span-12 px-8 py-6 bg-slate-50 border-y border-slate-200 mt-1 mb-3 rounded-lg shadow-inner">
+                      {!expandedInvoiceData ? (
+                        <div className="text-slate-500 font-body text-sm flex items-center gap-2">
+                          <span className="material-symbols-outlined animate-spin text-[18px]">refresh</span>
+                          Se încarcă detaliile...
+                        </div>
+                      ) : (
+                        <div className="flex flex-col md:flex-row gap-8">
+                          <div className="flex-1">
+                            <h4 className="font-manrope font-bold text-slate-800 mb-4 flex items-center gap-2">
+                              <span className="material-symbols-outlined text-orange-600 text-[20px]">kitchen</span>
+                              Articole Factură
+                            </h4>
+                            <table className="w-full text-left font-body text-sm">
+                              <thead className="text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                  <th className="pb-2">Ingredient</th>
+                                  <th className="pb-2 text-right">Cantitate</th>
+                                  <th className="pb-2 text-right">Preț Unitar</th>
+                                  <th className="pb-2 text-right">Total</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {expandedInvoiceData.items.map(item => (
+                                  <tr key={item.id}>
+                                    <td className="py-2 text-slate-800 font-medium">{item.ingredient_name}</td>
+                                    <td className="py-2 text-slate-600 text-right">{item.quantity} <span className="text-xs uppercase ml-0.5">{item.unit_of_measure}</span></td>
+                                    <td className="py-2 text-slate-600 text-right">{item.unit_price} RON</td>
+                                    <td className="py-2 font-bold text-orange-700 text-right">{(item.quantity * item.unit_price).toFixed(2)} RON</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          {expandedInvoiceData.image_url && (
+                            <div className="w-full md:w-1/3 flex flex-col gap-2 md:border-l md:border-slate-200 md:pl-8">
+                              <h4 className="font-manrope font-bold text-slate-800 mb-2 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-orange-600 text-[20px]">image</span>
+                                Imagine Factură
+                              </h4>
+                              <a href={`${baseUrl}${expandedInvoiceData.image_url}`} target="_blank" rel="noreferrer" className="block hover:opacity-90 transition-opacity">
+                                <img src={`${baseUrl}${expandedInvoiceData.image_url}`} alt="Factura" className="w-full h-auto max-h-48 object-cover rounded-lg border border-slate-200 shadow-sm" />
+                              </a>
+                              <a href={`${baseUrl}${expandedInvoiceData.image_url}`} target="_blank" rel="noreferrer" className="text-sm font-bold text-orange-600 hover:underline mt-1 flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                                Vezi la dimensiune completă
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
               {invoices.length === 0 && (
                 <div className="text-center py-8 text-slate-500 font-medium">Nu există facturi înregistrate.</div>
@@ -270,7 +370,7 @@ const Invoices = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 md:col-span-2">
+              <div className="flex flex-col gap-2">
                 <label className="font-body text-sm font-semibold text-slate-700" htmlFor="date">Data Emiterii</label>
                 <div className="relative">
                   <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">calendar_today</span>
@@ -282,6 +382,17 @@ const Invoices = () => {
                     className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2.5 pl-10 pr-3 font-body text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all"
                   />
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="font-body text-sm font-semibold text-slate-700" htmlFor="image">Poză Factură (Opțional)</label>
+                <input 
+                  id="image" 
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files[0])}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 font-body text-sm text-slate-900 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 transition-all cursor-pointer"
+                />
               </div>
             </div>
           </section>

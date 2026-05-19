@@ -269,6 +269,18 @@ const Ingredients = ({ user }) => {
               const isLowStock =
                 Number(ingredient.current_stock) <= Number(ingredient.alert_threshold);
 
+              const categoryIcons = {
+                'Vegetables': 'eco',
+                'Meat & Poultry': 'kebab_dining',
+                'Dairy & Eggs': 'egg',
+                'Dry Goods': 'inventory_2',
+                'Spices & Herbs': 'spa',
+                'Liquids': 'water_drop',
+                'General': 'grocery'
+              };
+              
+              const iconName = categoryIcons[ingredient.category] || 'grocery';
+
               return (
                 <div
                   key={ingredient.id}
@@ -285,7 +297,7 @@ const Ingredients = ({ user }) => {
                       }`}
                     >
                       <span className="material-symbols-outlined text-[20px]">
-                        {isLowStock ? 'local_fire_department' : 'grocery'}
+                        {isLowStock ? 'local_fire_department' : iconName}
                       </span>
                     </div>
                     <div>

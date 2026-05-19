@@ -13,6 +13,7 @@ const Ingredients = ({ user }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('Toate Categoriile');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // State pentru Modal
   const [showForm, setShowForm] = useState(false);
@@ -121,12 +122,16 @@ const Ingredients = ({ user }) => {
   if (isLoading) return <div className="text-slate-500 font-body">Se încarcă ingredientele...</div>;
   if (error) return <div className="text-red-500">Eroare: {error}</div>;
 
-  // Filtrăm lista bazat pe categoria selectată
- 
-  const filteredIngredients =
+  let filteredIngredients =
     selectedCategory === 'Toate Categoriile'
       ? ingredients
       : ingredients.filter((ing) => ing.category === selectedCategory);
+
+  if (searchQuery) {
+    filteredIngredients = filteredIngredients.filter((ing) =>
+      ing.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
 
   // Calculăm statisticile folosind DOAR lista filtrată
   const totalItems = filteredIngredients.length;
@@ -194,15 +199,35 @@ const Ingredients = ({ user }) => {
             </div>
           )}
         </div>
-        <div className="md:col-span-4 bg-slate-100 rounded-xl p-6 flex flex-col justify-center">
-          <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
-            Filtru Rapid
-          </label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20 cursor-pointer"
-          >
+        <div className="md:col-span-4 bg-slate-100 rounded-xl p-6 flex flex-col justify-center gap-4">
+          {/* Căutare */}
+          <div>
+            <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
+              Caută Ingredient
+            </label>
+            <div className="relative w-full">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">
+                search
+              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white border border-slate-200 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 rounded-lg pl-10 pr-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors outline-none shadow-sm"
+                placeholder="Ex. Morcovi..."
+              />
+            </div>
+          </div>
+          {/* Dropdown Categorie */}
+          <div>
+            <label className="font-manrope text-sm font-semibold text-slate-600 mb-2 block">
+              Categorie
+            </label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20 cursor-pointer shadow-sm"
+            >
             <option value="Toate Categoriile">Toate Categoriile</option>
             <option value="Vegetables">Legume</option>
             <option value="Meat & Poultry">Carne și Pui</option>
@@ -212,6 +237,7 @@ const Ingredients = ({ user }) => {
             <option value="Liquids">Lichide</option>
             <option value="General">General</option>
           </select>
+          </div>
         </div>
       </div>
 
@@ -322,7 +348,9 @@ const Ingredients = ({ user }) => {
 
             {filteredIngredients.length === 0 && (
               <div className="text-center py-8 text-slate-500 font-medium">
-                Niciun ingredient găsit în această categorie.
+                {searchQuery
+                  ? 'Niciun ingredient nu corespunde căutării.'
+                  : 'Niciun ingredient găsit în această categorie.'}
               </div>
             )}
           </div>

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { getRecipes, addRecipe, deleteRecipe, updateRecipe } from '../services/recipeService';
 import { getIngredients } from '../services/ingredientsService';
 
-const Recipes = () => {
+const Recipes = ({ user }) => {
+  const isManager = user?.role === 'MANAGER';
+
   const [recipes, setRecipes] = useState([]);
   const [availableIngredients, setAvailableIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -139,13 +141,15 @@ const Recipes = () => {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-manrope text-2xl font-bold text-slate-900">Lista de Rețete</h2>
-            <button
-              onClick={() => handleSelectRecipe(null)}
-              className="w-8 h-8 flex items-center justify-center bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
-              title="Creează Rețetă Nouă"
-            >
-              <span className="material-symbols-outlined text-[20px]">add</span>
-            </button>
+            {isManager && (
+              <button
+                onClick={() => handleSelectRecipe(null)}
+                className="w-8 h-8 flex items-center justify-center bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+                title="Creează Rețetă Nouă"
+              >
+                <span className="material-symbols-outlined text-[20px]">add</span>
+              </button>
+            )}
           </div>
           <div className="relative w-full">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">
@@ -253,7 +257,7 @@ const Recipes = () => {
           </div>
 
           {/* Butonul Edit Recipe este shrink-0 pentru a nu fi redus de flexbox */}
-          {selectedRecipe && (
+          {selectedRecipe && isManager && (
             <div className="flex gap-3 relative z-10 mt-4 sm:mt-0 shrink-0">
               <button
                 onClick={handleEditClick}
@@ -283,7 +287,7 @@ const Recipes = () => {
               <div className="col-span-6">Nume Ingredient</div>
               <div className="col-span-2 text-right">Cantitate</div>
               <div className="col-span-2">U.M.</div>
-              <div className="col-span-2 text-right">Acțiune</div>
+              {isManager && <div className="col-span-2 text-right">Acțiune</div>}
             </div>
 
             {/* Table Body */}
@@ -306,16 +310,18 @@ const Recipes = () => {
                       {ing.quantity_required}
                     </div>
                     <div className="col-span-2 text-sm text-slate-500">{ing.unit_of_measure}</div>
-                    <div className="col-span-2 text-right">
-                      {!selectedRecipe && (
-                        <button
-                          onClick={() => handleRemoveDraftIngredient(ing.ingredient_id)}
-                          className="text-slate-400 hover:text-red-600 transition-colors p-1"
-                        >
-                          <span className="material-symbols-outlined text-[20px]">delete</span>
-                        </button>
-                      )}
-                    </div>
+                    {isManager && (
+                      <div className="col-span-2 text-right">
+                        {!selectedRecipe && (
+                          <button
+                            onClick={() => handleRemoveDraftIngredient(ing.ingredient_id)}
+                            className="text-slate-400 hover:text-red-600 transition-colors p-1"
+                          >
+                            <span className="material-symbols-outlined text-[20px]">delete</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )
               )}
@@ -328,7 +334,7 @@ const Recipes = () => {
             </div>
 
             {/* Add Ingredient Input (DOAR ÎN CREATE/EDIT MODE) */}
-            {!selectedRecipe && (
+            {!selectedRecipe && isManager && (
               <div className="mt-8 pt-6 relative border-t border-slate-100">
                 <label className="text-xs font-bold text-slate-500 mb-2 block uppercase tracking-wider">
                   Adaugă Ingredient din Nomenclator
@@ -380,14 +386,14 @@ const Recipes = () => {
                   <p className="text-sm text-slate-600 whitespace-pre-wrap">
                     {selectedRecipe.description || 'Fără instrucțiuni speciale.'}
                   </p>
-                ) : (
+                ) : isManager ? (
                   <textarea
                     value={recipeDescription}
                     onChange={(e) => setRecipeDescription(e.target.value)}
                     className="w-full h-full bg-transparent border-none focus:ring-0 p-0 text-sm text-slate-900 placeholder:text-slate-400 resize-none outline-none leading-relaxed"
                     placeholder="Introdu instrucțiuni de producție sau note pentru garnitură..."
                   />
-                )}
+                ) : null}
               </div>
             </div>
 
@@ -405,15 +411,19 @@ const Recipes = () => {
                         <span className="w-2 h-2 rounded-full bg-teal-500"></span> Activă
                       </span>
                     </div>
-                    <div className="h-px bg-slate-100 my-2"></div>
-                    <button
-                      onClick={() => handleDelete(selectedRecipe.id)}
-                      className="w-full bg-red-50 text-red-600 hover:bg-red-100 py-3 rounded-lg font-bold text-sm transition-colors mt-2"
-                    >
-                      Șterge Rețeta
-                    </button>
+                    {isManager && (
+                      <>
+                        <div className="h-px bg-slate-100 my-2"></div>
+                        <button
+                          onClick={() => handleDelete(selectedRecipe.id)}
+                          className="w-full bg-red-50 text-red-600 hover:bg-red-100 py-3 rounded-lg font-bold text-sm transition-colors mt-2"
+                        >
+                          Șterge Rețeta
+                        </button>
+                      </>
+                    )}
                   </>
-                ) : (
+                ) : isManager ? (
                   <>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-500">Status</span>
@@ -440,7 +450,7 @@ const Recipes = () => {
                       </button>
                     )}
                   </>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

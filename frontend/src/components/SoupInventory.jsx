@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getCookedStock } from '../services/productionService';
 
-const SoupInventory = () => {
+const SoupInventory = ({ user }) => {
+  const isProduction = user?.role === 'PRODUCTION';
   const [stock, setStock] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -121,12 +122,14 @@ const SoupInventory = () => {
                       </div>
 
                       <div className="col-span-2 text-right">
-                        <button className="opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 hover:bg-orange-100 hover:text-orange-700 text-slate-600 text-xs font-bold px-4 py-2 rounded-lg flex items-center justify-end gap-1 ml-auto">
-                          Transferă la Servire
-                          <span className="material-symbols-outlined text-[14px]">
-                            arrow_forward
-                          </span>
-                        </button>
+                        {!isProduction && (
+                          <button className="opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 hover:bg-orange-100 hover:text-orange-700 text-slate-600 text-xs font-bold px-4 py-2 rounded-lg flex items-center justify-end gap-1 ml-auto">
+                            Transferă la Servire
+                            <span className="material-symbols-outlined text-[14px]">
+                              arrow_forward
+                            </span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   );

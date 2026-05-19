@@ -6,7 +6,9 @@ import {
   updateIngredient,
 } from '../services/ingredientsService';
 
-const Ingredients = () => {
+const Ingredients = ({ user }) => {
+  const isManager = user?.role === 'MANAGER';
+
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -144,18 +146,20 @@ const Ingredients = () => {
             Gestionează ingredientele și nivelul stocurilor.
           </p>
         </div>
-        <button
-          onClick={handleAddNewClick} // Modificat pentru a apela funcția dedicată
-          className="flex items-center gap-2 bg-gradient-to-b from-orange-600 to-orange-700 text-white px-6 py-3 rounded-md font-manrope font-semibold shadow-sm hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
-        >
-          <span
-            className="material-symbols-outlined text-[20px]"
-            style={{ fontVariationSettings: "'FILL' 1" }}
+        {isManager && (
+          <button
+            onClick={handleAddNewClick} // Modificat pentru a apela funcția dedicată
+            className="flex items-center gap-2 bg-gradient-to-b from-orange-600 to-orange-700 text-white px-6 py-3 rounded-md font-manrope font-semibold shadow-sm hover:shadow-md transition-all active:scale-95 whitespace-nowrap"
           >
-            add
-          </span>
-          Adaugă Ingredient Nou
-        </button>
+            <span
+              className="material-symbols-outlined text-[20px]"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              add
+            </span>
+            Adaugă Ingredient Nou
+          </button>
+        )}
       </div>
 
       {/* Stats/Filter Row */}
@@ -227,9 +231,11 @@ const Ingredients = () => {
             <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider">
               Limită Alertă
             </div>
-            <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
-              Acțiuni
-            </div>
+            {isManager && (
+              <div className="col-span-2 font-manrope text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
+                Acțiuni
+              </div>
+            )}
           </div>
 
           <div className="space-y-1 px-2">
@@ -291,23 +297,25 @@ const Ingredients = () => {
                     {ingredient.alert_threshold}
                   </div>
 
-                  <div className="col-span-2 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {/* Buton EDIT adăugat aici */}
-                    <button
-                      onClick={() => handleEditClick(ingredient)}
-                      className="w-8 h-8 rounded-md bg-slate-100 hover:bg-orange-100 hover:text-orange-600 text-slate-600 flex items-center justify-center transition-colors"
-                      title="Editează"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">edit</span>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(ingredient.id)}
-                      className="w-8 h-8 rounded-md bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-600 flex items-center justify-center transition-colors"
-                      title="Șterge"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">delete</span>
-                    </button>
-                  </div>
+                  {isManager && (
+                    <div className="col-span-2 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Buton EDIT adăugat aici */}
+                      <button
+                        onClick={() => handleEditClick(ingredient)}
+                        className="w-8 h-8 rounded-md bg-slate-100 hover:bg-orange-100 hover:text-orange-600 text-slate-600 flex items-center justify-center transition-colors"
+                        title="Editează"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(ingredient.id)}
+                        className="w-8 h-8 rounded-md bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-600 flex items-center justify-center transition-colors"
+                        title="Șterge"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

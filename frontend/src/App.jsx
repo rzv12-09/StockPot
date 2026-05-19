@@ -45,8 +45,19 @@ const NavItem = ({ to, icon, label, isCollapsed }) => {
 
 // Componenta principală care conține interfața
 function AppContent({ user, onLogout }) {
-  // Verificăm dacă user-ul este manager pentru a-i da permisiuni speciale
+  // Verificăm rolurile pentru a da permisiuni specifice
   const isManager = user?.role === 'MANAGER';
+  const isProduction = user?.role === 'PRODUCTION';
+  const isSales = user?.role === 'SALES';
+
+  const canViewIngredients = isManager || isProduction;
+  const canViewRecipes = isManager || isProduction;
+  const canViewProduction = isManager || isProduction;
+  const canViewSoupInventory = isManager || isProduction || isSales;
+  const canViewTransfer = isManager || isSales;
+  const canViewInvoices = isManager;
+  const canViewStaff = isManager;
+  const canViewAnalytics = isManager;
 
   // NOU: State pentru a controla dacă meniul e deschis sau închis
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -88,42 +99,30 @@ function AppContent({ user, onLogout }) {
         <div className="flex-1 flex flex-col font-manrope tracking-tight text-sm">
           <NavItem to="/" icon="dashboard" label="Panou Principal" isCollapsed={isCollapsed} />
 
-          {/* Ascundem tab-ul de inventar dacă NU ești manager */}
-          {isManager && (
-            <>
-              <NavItem
-                to="/ingredients"
-                icon="inventory_2"
-                label="Ingrediente"
-                isCollapsed={isCollapsed}
-              />
-              <NavItem
-                to="/invoices"
-                icon="receipt_long"
-                label="Facturi"
-                isCollapsed={isCollapsed}
-              />
-            </>
+          {canViewIngredients && (
+            <NavItem to="/ingredients" icon="inventory_2" label="Ingrediente" isCollapsed={isCollapsed} />
           )}
-
-          <NavItem to="/recipes" icon="menu_book" label="Rețetar" isCollapsed={isCollapsed} />
-          <NavItem
-            to="/production"
-            icon="soup_kitchen"
-            label="Producție"
-            isCollapsed={isCollapsed}
-          />
-          <NavItem
-            to="/soup-inventory"
-            icon="kitchen"
-            label="Cameră Frigorifică"
-            isCollapsed={isCollapsed}
-          />
-          <NavItem to="/transfer" icon="swap_horiz" label="Transfer Servire" isCollapsed={isCollapsed} />
-          {isManager && (
+          {canViewInvoices && (
+            <NavItem to="/invoices" icon="receipt_long" label="Facturi" isCollapsed={isCollapsed} />
+          )}
+          {canViewRecipes && (
+            <NavItem to="/recipes" icon="menu_book" label="Rețetar" isCollapsed={isCollapsed} />
+          )}
+          {canViewProduction && (
+            <NavItem to="/production" icon="soup_kitchen" label="Producție" isCollapsed={isCollapsed} />
+          )}
+          {canViewSoupInventory && (
+            <NavItem to="/soup-inventory" icon="kitchen" label="Cameră Frigorifică" isCollapsed={isCollapsed} />
+          )}
+          {canViewTransfer && (
+            <NavItem to="/transfer" icon="swap_horiz" label="Transfer Servire" isCollapsed={isCollapsed} />
+          )}
+          {canViewStaff && (
             <NavItem to="/staff" icon="group" label="Personal" isCollapsed={isCollapsed} />
           )}
-          <NavItem to="/analytics" icon="analytics" label="Rapoarte" isCollapsed={isCollapsed} />
+          {canViewAnalytics && (
+            <NavItem to="/analytics" icon="analytics" label="Rapoarte" isCollapsed={isCollapsed} />
+          )}
         </div>
       </nav>
 
@@ -175,15 +174,15 @@ function AppContent({ user, onLogout }) {
           <Routes>
             <Route path="/" element={<Dashboard user={user} />} />
             {/* Rute protejate */}
-            {isManager && <Route path="/ingredients" element={<Ingredients />} />}
-            {isManager && <Route path="/invoices" element={<Invoices />} />}
-            <Route path="/recipes" element={<Recipes />} />
-            <Route path="/production" element={<Production />} />
-            <Route path="/soup-inventory" element={<SoupInventory />} />
-            <Route path="/transfer" element={<ServiceTransfer />} />
-            {isManager && <Route path="/staff" element={<UsersManagement />} />}
+            {canViewIngredients && <Route path="/ingredients" element={<Ingredients user={user} />} />}
+            {canViewInvoices && <Route path="/invoices" element={<Invoices />} />}
+            {canViewRecipes && <Route path="/recipes" element={<Recipes user={user} />} />}
+            {canViewProduction && <Route path="/production" element={<Production />} />}
+            {canViewSoupInventory && <Route path="/soup-inventory" element={<SoupInventory user={user} />} />}
+            {canViewTransfer && <Route path="/transfer" element={<ServiceTransfer />} />}
+            {canViewStaff && <Route path="/staff" element={<UsersManagement />} />}
+            {canViewAnalytics && <Route path="/analytics" element={<Analytics />} />}
             <Route path="*" element={<Navigate to="/" replace />} />
-            <Route path="/analytics" element={<Analytics />} />
           </Routes>
         </main>
       </div>

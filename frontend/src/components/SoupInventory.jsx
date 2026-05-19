@@ -5,6 +5,7 @@ const SoupInventory = ({ user }) => {
   const isProduction = user?.role === 'PRODUCTION';
   const [stock, setStock] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchStock();
@@ -21,8 +22,13 @@ const SoupInventory = ({ user }) => {
     }
   };
 
-  // Calculăm volumul total
-  const totalQuantity = stock.reduce((sum, item) => sum + Number(item.current_quantity), 0);
+  // Filtrăm stocul pe baza căutării
+  const filteredStock = stock.filter((item) =>
+    item.recipe_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Calculăm volumul total doar pentru elementele filtrate
+  const totalQuantity = filteredStock.reduce((sum, item) => sum + Number(item.current_quantity), 0);
 
   if (isLoading) {
     return (
@@ -69,6 +75,22 @@ const SoupInventory = ({ user }) => {
         </div>
       </div>
 
+      {/* Bară de Căutare */}
+      <div className="mb-6">
+        <div className="relative w-full max-w-md">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">
+            search
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white border border-slate-200 focus:border-orange-600 focus:ring-1 focus:ring-orange-600 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors outline-none shadow-sm"
+            placeholder="Caută după numele ciorbei..."
+          />
+        </div>
+      </div>
+
       {/* Secțiunea Principală - Tabelul */}
       <div className="flex flex-col gap-6">
         {/* Batch Data Table */}
@@ -84,12 +106,12 @@ const SoupInventory = ({ user }) => {
 
             {/* Data Rows */}
             <div className="flex flex-col gap-1">
-              {stock.length === 0 ? (
+              {filteredStock.length === 0 ? (
                 <div className="py-12 text-center text-slate-500 font-medium">
-                  Camera frigorifică este goală. Mergi la Producție pentru a găti câteva șarje!
+                  {searchQuery ? 'Nu am găsit nicio ciorbă cu acest nume.' : 'Camera frigorifică este goală. Mergi la Producție pentru a găti câteva șarje!'}
                 </div>
               ) : (
-                stock.map((item, index) => {
+                filteredStock.map((item, index) => {
                   const isEven = index % 2 === 0;
 
                   return (

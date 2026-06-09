@@ -84,7 +84,7 @@ const Dashboard = ({ user }) => {
 
       {/* KPIs Grid */}
       <h3 className="font-manrope text-xl font-bold text-slate-900 mb-4">Privire de Ansamblu</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {/* KPI 1: Active Batches */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
@@ -120,16 +120,7 @@ const Dashboard = ({ user }) => {
               </p>
             </div>
 
-            {/* KPI 4: Efficiency */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 relative overflow-hidden">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-sm font-manrope font-bold text-slate-500 uppercase tracking-wider">Eficiență</h3>
-                <span className="material-symbols-outlined text-teal-600 p-2 bg-teal-50 rounded-lg">speed</span>
-              </div>
-              <p className="text-3xl font-manrope font-black text-teal-700 tracking-tight">
-                {kpis.productionEfficiency}%
-              </p>
-            </div>
+
           </>
         )}
       </div>

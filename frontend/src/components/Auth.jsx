@@ -145,7 +145,7 @@ const Auth = ({ onLoginSuccess }) => {
                 />
                 <label
                   htmlFor="username"
-                  className="absolute left-4 top-4 text-[#5a4138] font-label text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
+                  className="absolute left-4 top-2 text-[#5a4138] font-label text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
                 >
                   Utilizator
                 </label>
@@ -164,7 +164,7 @@ const Auth = ({ onLoginSuccess }) => {
                 />
                 <label
                   htmlFor="password"
-                  className="absolute left-4 top-4 text-[#5a4138] font-label text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
+                  className="absolute left-4 top-2 text-[#5a4138] font-label text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
                 >
                   Parolă
                 </label>
@@ -193,7 +193,7 @@ const Auth = ({ onLoginSuccess }) => {
                   />
                   <label
                     htmlFor="confirm_password"
-                    className="absolute left-4 top-4 text-[#5a4138] font-label text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
+                    className="absolute left-4 top-2 text-[#5a4138] font-label text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-4 peer-focus:top-2 peer-focus:text-xs peer-focus:text-[#ad2c00]"
                   >
                     Confirmă Parola
                   </label>

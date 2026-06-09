@@ -7,8 +7,6 @@ sa pot sa fac refill la o ciorba in aceeasi supiera
 sa am istorc in fiecare zi pe supiera cate ciorbe si ce ciorbe au fost in supiera respectiva
 sa pot sa vad monthly production volume si sa vad si pe fiecare ciorba in parte
 grafic cu consumul de ciorba saptamanal (total si pe fiecare ciorba in parte)
-tab de facturare si vizualizare istoric facturi
-posibilitate de incarcare poza factura
 sa pot sa adaug supiere, editez, etc
 search-bar lista ingrediente la creare/editare retete 
 traducere roluir sales-production

@@ -63,7 +63,7 @@ const Analytics = () => {
       </div>
 
       {/* SECTION 1: Top Row KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* KPI 1: Total Ingredients */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110"></div>
@@ -122,26 +122,7 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* KPI 4: Efficiency */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 relative overflow-hidden group">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-teal-500/5 rounded-bl-[100px] -z-10 transition-transform group-hover:scale-110"></div>
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-sm font-manrope font-bold text-slate-500 uppercase tracking-wider">
-              Eficiență
-            </h3>
-            <span className="material-symbols-outlined text-teal-600 p-2 bg-teal-50 rounded-lg">
-              speed
-            </span>
-          </div>
-          <p className="text-3xl font-manrope font-black text-teal-700 tracking-tight">
-            {kpis.productionEfficiency}% TODO
-          </p>
-          <div className="mt-2 flex items-center gap-1 text-xs font-body">
-            <span className="material-symbols-outlined text-[14px] text-teal-600">trending_up</span>
-            <span className="text-teal-600 font-bold">+1.2%</span>
-            <span className="text-slate-400">față de țintă</span>
-          </div>
-        </div>
+
       </div>
 
       {/* SECTION 2: Charts Area */}

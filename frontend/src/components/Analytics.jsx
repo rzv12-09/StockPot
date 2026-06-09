@@ -95,8 +95,7 @@ const Analytics = () => {
             </span>
           </div>
           <p className="text-3xl font-manrope font-black text-slate-900 tracking-tight">
-            {kpis.activeMarmites}{' '}
-            <span className="text-lg font-bold text-slate-400">Litri</span>
+            {kpis.activeMarmites} <span className="text-lg font-bold text-slate-400">Litri</span>
           </p>
           <div className="mt-2 flex items-center gap-1 text-xs font-body">
             <span className="text-slate-400">În camera frigorifică</span>
@@ -115,14 +114,13 @@ const Analytics = () => {
             </span>
           </div>
           <p className="text-3xl font-manrope font-black text-red-600 tracking-tight">
-            {kpis.lowStockAlerts} <span className="text-lg font-bold text-red-400/70">Articole</span>
+            {kpis.lowStockAlerts}{' '}
+            <span className="text-lg font-bold text-red-400/70">Articole</span>
           </p>
           <div className="mt-2 flex items-center gap-1 text-xs font-body text-red-500 font-medium">
             Revizuiește inventarul imediat
           </div>
         </div>
-
-
       </div>
 
       {/* SECTION 2: Charts Area */}
@@ -227,7 +225,9 @@ const Analytics = () => {
               </>
             ) : (
               <div className="flex items-center justify-center h-full min-h-[150px]">
-                <p className="text-slate-400 text-xs font-medium">Niciun ingredient consumat încă.</p>
+                <p className="text-slate-400 text-xs font-medium">
+                  Niciun ingredient consumat încă.
+                </p>
               </div>
             )}
           </div>
@@ -276,9 +276,7 @@ const Analytics = () => {
         {/* Top Recipes Table (Real DB Data) */}
         <div className="lg:col-span-8 bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden flex flex-col">
           <div className="p-6 pb-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
-            <h3 className="font-manrope text-lg font-bold text-slate-900">
-              Cele Mai Bune Rețete
-            </h3>
+            <h3 className="font-manrope text-lg font-bold text-slate-900">Cele Mai Bune Rețete</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">

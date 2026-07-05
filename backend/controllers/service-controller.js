@@ -89,3 +89,96 @@ export const emptySlot = async (req, res) => {
     res.status(500).json({ error: 'Failed to empty the pan.' });
   }
 };
+
+// Creează o supieră nouă
+export const createSlot = async (req, res) => {
+  const { slot_name } = req.body;
+
+  if (!slot_name || !slot_name.trim()) {
+    return res.status(400).json({ error: 'Numele supiererei este obligatoriu.' });
+  }
+
+  try {
+    // Verificăm dacă există deja o supieră cu același nume
+    const existing = await db.query(
+      `SELECT id FROM Serving_Slots WHERE LOWER(slot_name) = LOWER($1)`,
+      [slot_name.trim()]
+    );
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ error: 'Există deja o supieră cu acest nume.' });
+    }
+
+    const { rows } = await db.query(
+      `INSERT INTO Serving_Slots (slot_name) VALUES ($1) RETURNING *`,
+      [slot_name.trim()]
+    );
+    res.status(201).json(rows[0]);
+  } catch (error) {
+    console.error('Create slot error:', error);
+    res.status(500).json({ error: 'Eroare la crearea supiererei.' });
+  }
+};
+
+// Editează numele unei supiere
+export const updateSlot = async (req, res) => {
+  const { id } = req.params;
+  const { slot_name } = req.body;
+
+  if (!slot_name || !slot_name.trim()) {
+    return res.status(400).json({ error: 'Numele supiererei este obligatoriu.' });
+  }
+
+  try {
+    // Verificăm dacă există deja o altă supieră cu același nume
+    const existing = await db.query(
+      `SELECT id FROM Serving_Slots WHERE LOWER(slot_name) = LOWER($1) AND id != $2`,
+      [slot_name.trim(), id]
+    );
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ error: 'Există deja o supieră cu acest nume.' });
+    }
+
+    const { rows, rowCount } = await db.query(
+      `UPDATE Serving_Slots SET slot_name = $1 WHERE id = $2 RETURNING *`,
+      [slot_name.trim(), id]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Supiera nu a fost găsită.' });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    console.error('Update slot error:', error);
+    res.status(500).json({ error: 'Eroare la actualizarea supiererei.' });
+  }
+};
+
+// Șterge o supieră (doar dacă este goală)
+export const deleteSlot = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Verificăm dacă supiera este goală
+    const { rows } = await db.query(
+      `SELECT recipe_id, slot_name FROM Serving_Slots WHERE id = $1`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Supiera nu a fost găsită.' });
+    }
+
+    if (rows[0].recipe_id !== null) {
+      return res.status(400).json({
+        error: `Supiera "${rows[0].slot_name}" conține produs. Golește supiera înainte de a o șterge.`,
+      });
+    }
+
+    await db.query(`DELETE FROM Serving_Slots WHERE id = $1`, [id]);
+    res.json({ message: `Supiera "${rows[0].slot_name}" a fost ștearsă cu succes.` });
+  } catch (error) {
+    console.error('Delete slot error:', error);
+    res.status(500).json({ error: 'Eroare la ștergerea supiererei.' });
+  }
+};

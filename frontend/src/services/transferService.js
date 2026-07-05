@@ -35,3 +35,43 @@ export const emptyServingSlot = async (slotId) => {
   }
   return await response.json();
 };
+
+// --- CRUD Supiere ---
+
+export const createServingSlot = async (slotName) => {
+  const response = await fetch(`${baseUrl}/api/service/slots`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ slot_name: slotName }),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Eroare la crearea supiererei.');
+  }
+  return await response.json();
+};
+
+export const updateServingSlot = async (id, slotName) => {
+  const response = await fetch(`${baseUrl}/api/service/slots/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ slot_name: slotName }),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Eroare la actualizarea supiererei.');
+  }
+  return await response.json();
+};
+
+export const deleteServingSlot = async (id) => {
+  const response = await fetch(`${baseUrl}/api/service/slots/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Eroare la ștergerea supiererei.');
+  }
+  return await response.json();
+};

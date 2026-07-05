@@ -179,7 +179,7 @@ function AppContent({ user, onLogout }) {
             {canViewRecipes && <Route path="/recipes" element={<Recipes user={user} />} />}
             {canViewProduction && <Route path="/production" element={<Production />} />}
             {canViewSoupInventory && <Route path="/soup-inventory" element={<SoupInventory user={user} />} />}
-            {canViewTransfer && <Route path="/transfer" element={<ServiceTransfer />} />}
+            {canViewTransfer && <Route path="/transfer" element={<ServiceTransfer user={user} />} />}
             {canViewStaff && <Route path="/staff" element={<UsersManagement />} />}
             {canViewAnalytics && <Route path="/analytics" element={<Analytics />} />}
             <Route path="*" element={<Navigate to="/" replace />} />

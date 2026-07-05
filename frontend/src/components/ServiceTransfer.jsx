@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { getCookedStock } from '../services/productionService';
-import { emptyServingSlot, getServingSlots, executeTransfer } from '../services/transferService';
+import { emptyServingSlot, getServingSlots, executeTransfer, createServingSlot, updateServingSlot, deleteServingSlot } from '../services/transferService';
 
-const ServiceTransfer = () => {
+const ServiceTransfer = ({ user }) => {
+  const isManager = user?.role === 'MANAGER';
+
   const [fridgeStock, setFridgeStock] = useState([]);
   const [servingSlots, setServingSlots] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -14,6 +16,13 @@ const ServiceTransfer = () => {
   const [isTransferring, setIsTransferring] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // State pentru modal CRUD supieră
+  const [showSlotModal, setShowSlotModal] = useState(false);
+  const [editingSlot, setEditingSlot] = useState(null); // null = creare, obiect = editare
+  const [slotFormName, setSlotFormName] = useState('');
+  const [slotFormError, setSlotFormError] = useState('');
+  const [isSavingSlot, setIsSavingSlot] = useState(false);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -69,6 +78,71 @@ const ServiceTransfer = () => {
       setSuccess('Supiera a fost golită cu succes!');
       if (selectedSlot?.id === slotId) setSelectedSlot(null);
       await fetchData(); // Reîncărcăm datele
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // --- CRUD Supiere ---
+  const openCreateModal = () => {
+    setEditingSlot(null);
+    setSlotFormName('');
+    setSlotFormError('');
+    setShowSlotModal(true);
+  };
+
+  const openEditModal = (slot) => {
+    setEditingSlot(slot);
+    setSlotFormName(slot.slot_name);
+    setSlotFormError('');
+    setShowSlotModal(true);
+  };
+
+  const closeSlotModal = () => {
+    setShowSlotModal(false);
+    setEditingSlot(null);
+    setSlotFormName('');
+    setSlotFormError('');
+  };
+
+  const handleSlotSave = async (e) => {
+    e.preventDefault();
+    if (!slotFormName.trim()) {
+      setSlotFormError('Numele supiererei este obligatoriu.');
+      return;
+    }
+
+    setIsSavingSlot(true);
+    setSlotFormError('');
+
+    try {
+      if (editingSlot) {
+        await updateServingSlot(editingSlot.id, slotFormName.trim());
+        setSuccess(`Supiera "${slotFormName.trim()}" a fost actualizată cu succes!`);
+      } else {
+        await createServingSlot(slotFormName.trim());
+        setSuccess(`Supiera "${slotFormName.trim()}" a fost creată cu succes!`);
+      }
+      closeSlotModal();
+      await fetchData();
+    } catch (err) {
+      setSlotFormError(err.message);
+    } finally {
+      setIsSavingSlot(false);
+    }
+  };
+
+  const handleDeleteSlot = async (slot) => {
+    if (!window.confirm(`Ești sigur că vrei să ștergi supiera "${slot.slot_name}"?`)) return;
+
+    setError('');
+    setSuccess('');
+
+    try {
+      await deleteServingSlot(slot.id);
+      setSuccess(`Supiera "${slot.slot_name}" a fost ștearsă cu succes!`);
+      if (selectedSlot?.id === slot.id) setSelectedSlot(null);
+      await fetchData();
     } catch (err) {
       setError(err.message);
     }
@@ -217,10 +291,21 @@ const ServiceTransfer = () => {
 
         {/* COLOANA 3: Serving Area (Right) */}
         <section className="lg:col-span-4 flex flex-col max-h-[800px]">
-          <h3 className="font-manrope text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined text-orange-500">heat_pump</span>
-            Zonă Servire
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-manrope text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="material-symbols-outlined text-orange-500">heat_pump</span>
+              Zonă Servire
+            </h3>
+            {isManager && (
+              <button
+                onClick={openCreateModal}
+                className="flex items-center gap-1.5 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+              >
+                <span className="material-symbols-outlined text-[16px]">add</span>
+                Supieră Nouă
+              </button>
+            )}
+          </div>
           <div className="bg-white rounded-xl p-4 flex-1 overflow-y-auto space-y-4 border border-slate-200 shadow-sm">
             {servingSlots.map((slot) => {
               const isOccupied = slot.recipe_id !== null;
@@ -242,9 +327,20 @@ const ServiceTransfer = () => {
                             {slot.slot_name}
                           </h4>
                         </div>
-                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded">
-                          Ocupată
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded">
+                            Ocupată
+                          </span>
+                          {isManager && (
+                            <button
+                              onClick={() => openEditModal(slot)}
+                              className="p-1 text-slate-400 hover:text-orange-600 transition-colors"
+                              title="Editează supiera"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div className="flex justify-between items-end mb-2">
                         <div>
@@ -279,12 +375,38 @@ const ServiceTransfer = () => {
                 <div
                   key={slot.id}
                   onClick={() => setSelectedSlot(slot)}
-                  className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center h-32 transition-colors cursor-pointer ${
+                  className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center h-32 transition-colors cursor-pointer relative group/slot ${
                     isSelected
                       ? 'border-orange-500 bg-orange-50'
                       : 'border-slate-300 hover:bg-slate-50'
                   }`}
                 >
+                  {/* Butoane de Management pe slot gol - doar pentru Manager */}
+                  {isManager && (
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover/slot:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditModal(slot);
+                        }}
+                        className="p-1 text-slate-400 hover:text-orange-600 transition-colors rounded hover:bg-white"
+                        title="Editează supiera"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteSlot(slot);
+                        }}
+                        className="p-1 text-slate-400 hover:text-red-600 transition-colors rounded hover:bg-white"
+                        title="Șterge supiera"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </div>
+                  )}
+
                   <span
                     className={`material-symbols-outlined text-3xl mb-2 ${
                       isSelected ? 'text-orange-600' : 'text-slate-400 opacity-50'
@@ -310,6 +432,96 @@ const ServiceTransfer = () => {
           </div>
         </section>
       </div>
+
+      {/* Modal Creare/Editare Supieră */}
+      {showSlotModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+            {/* Header Modal */}
+            <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-orange-600">
+                    {editingSlot ? 'edit' : 'add_circle'}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-manrope font-bold text-lg text-slate-900">
+                    {editingSlot ? 'Editează Supiera' : 'Supieră Nouă'}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    {editingSlot
+                      ? 'Modifică numele supiererei existente.'
+                      : 'Adaugă o nouă supieră în zona de servire.'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={closeSlotModal}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Body Modal */}
+            <form onSubmit={handleSlotSave}>
+              <div className="px-6 py-6">
+                {slotFormError && (
+                  <div className="mb-4 bg-red-50 text-red-700 p-3 rounded-lg border border-red-200 text-sm">
+                    {slotFormError}
+                  </div>
+                )}
+
+                <label
+                  className="block font-body text-sm font-semibold text-slate-700 mb-2"
+                  htmlFor="slot_name"
+                >
+                  Numele Supiererei
+                </label>
+                <input
+                  required
+                  autoFocus
+                  id="slot_name"
+                  type="text"
+                  value={slotFormName}
+                  onChange={(e) => setSlotFormName(e.target.value)}
+                  placeholder="ex. Supiera A-4"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-slate-900 font-body text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all"
+                />
+              </div>
+
+              {/* Footer Modal */}
+              <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={closeSlotModal}
+                  className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-white transition-colors"
+                >
+                  Anulează
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingSlot}
+                  className="px-6 py-2.5 bg-gradient-to-b from-orange-600 to-orange-700 text-white rounded-lg text-sm font-bold shadow-sm hover:shadow-md transition-all disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSavingSlot ? (
+                    <>
+                      <span className="material-symbols-outlined animate-spin text-[16px]">refresh</span>
+                      Se salvează...
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-[16px]">save</span>
+                      {editingSlot ? 'Salvează' : 'Creează'}
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

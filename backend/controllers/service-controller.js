@@ -41,12 +41,12 @@ export const executeTransfer = async (req, res) => {
       );
     }
 
-    // 2. Verificăm dacă Supiera (Slotul) este GOALĂ
+    // 2. Verificăm dacă Supiera (Slotul) este GOALĂ sau CONȚINE ACEEAȘI CIORBĂ
     const checkSlotQuery = `SELECT recipe_id, slot_name FROM Serving_Slots WHERE id = $1`;
     const { rows: slot } = await client.query(checkSlotQuery, [slot_id]);
 
-    if (slot[0].recipe_id !== null) {
-      throw new Error(`Slot ${slot[0].slot_name} is already full! Please empty it first.`);
+    if (slot[0].recipe_id !== null && slot[0].recipe_id !== recipe_id) {
+      throw new Error(`Slot ${slot[0].slot_name} is already full with a different soup! Please empty it first.`);
     }
 
     // 3. Scădem EXACT 10L din Frigider

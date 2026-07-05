@@ -100,6 +100,64 @@ export const getCookedStock = async (req, res) => {
   }
 };
 
+// Reinventariere: Actualizează manual cantitatea unei ciorbe din frigider
+export const updateSoupStock = async (req, res) => {
+  const { id } = req.params;
+  const { new_quantity } = req.body;
+
+  if (new_quantity === undefined || new_quantity === null || isNaN(new_quantity) || Number(new_quantity) < 0) {
+    return res.status(400).json({ error: 'Cantitatea trebuie să fie un număr >= 0.' });
+  }
+
+  try {
+    const quantity = Number(new_quantity);
+
+    if (quantity === 0) {
+      // Dacă cantitatea e 0, ștergem înregistrarea
+      const { rowCount } = await db.query(`DELETE FROM finished_soups WHERE id = $1`, [id]);
+      if (rowCount === 0) {
+        return res.status(404).json({ error: 'Înregistrarea nu a fost găsită.' });
+      }
+      return res.json({ message: 'Stocul a fost eliminat (cantitate 0).' });
+    }
+
+    const { rows, rowCount } = await db.query(
+      `UPDATE finished_soups SET current_quantity = $1, last_updated = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *`,
+      [quantity, id]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Înregistrarea nu a fost găsită.' });
+    }
+
+    res.json({ message: 'Stocul a fost actualizat cu succes.', data: rows[0] });
+  } catch (error) {
+    console.error('Update soup stock error:', error);
+    res.status(500).json({ error: 'Eroare la actualizarea stocului.' });
+  }
+};
+
+// Obține batch-urile de producție pentru o rețetă specifică
+export const getBatchesByRecipe = async (req, res) => {
+  const { recipeId } = req.params;
+
+  try {
+    const query = `
+      SELECT pb.id, pb.quantity_produced, pb.production_date, 
+             u.username as produced_by
+      FROM Production_Batches pb
+      LEFT JOIN Users u ON pb.user_id = u.id
+      WHERE pb.recipe_id = $1
+      ORDER BY pb.production_date DESC
+    `;
+    const { rows } = await db.query(query, [recipeId]);
+    res.json(rows);
+  } catch (error) {
+    console.error('Get batches error:', error);
+    res.status(500).json({ error: 'Eroare la obținerea batch-urilor.' });
+  }
+};
+
 export const getProductionPreview = async (req, res) => {
   const { recipe_id, quantity_produced } = req.body;
 

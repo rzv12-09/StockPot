@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { getCookedStock } from '../services/productionService';
 import { emptyServingSlot, getServingSlots, executeTransfer, createServingSlot, updateServingSlot, deleteServingSlot } from '../services/transferService';
 
@@ -24,12 +25,24 @@ const ServiceTransfer = ({ user }) => {
   const [slotFormError, setSlotFormError] = useState('');
   const [isSavingSlot, setIsSavingSlot] = useState(false);
 
+  const location = useLocation();
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
       const [stockData, slotsData] = await Promise.all([getCookedStock(), getServingSlots()]);
-      setFridgeStock(stockData.filter((item) => item.current_quantity > 0)); // Arătăm doar ce e în stoc
+      const availableStock = stockData.filter((item) => item.current_quantity > 0);
+      setFridgeStock(availableStock);
       setServingSlots(slotsData);
+
+      // Pre-selectare ciorbă dacă venim din Inventar Ciorbe
+      if (location.state?.preselectedRecipe && !selectedRecipe) {
+        const preselected = location.state.preselectedRecipe;
+        const match = availableStock.find((item) => item.recipe_id === preselected.recipe_id);
+        if (match) {
+          setSelectedRecipe(match);
+        }
+      }
     } catch (err) {
       setError('Încărcarea datelor de transfer a eșuat.');
       console.error(err);
@@ -310,17 +323,25 @@ const ServiceTransfer = ({ user }) => {
             {servingSlots.map((slot) => {
               const isOccupied = slot.recipe_id !== null;
               const isSelected = selectedSlot?.id === slot.id;
+              const canRefill = isOccupied && selectedRecipe && slot.recipe_id === selectedRecipe.recipe_id;
 
               if (isOccupied) {
                 return (
                   <div
                     key={slot.id}
-                    className="bg-slate-50 rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between gap-4"
+                    onClick={canRefill ? () => setSelectedSlot(slot) : undefined}
+                    className={`rounded-xl p-5 border flex flex-col justify-between gap-4 transition-all ${
+                      canRefill ? 'cursor-pointer hover:border-orange-400' : ''
+                    } ${
+                      isSelected
+                        ? 'bg-orange-50 border-orange-500 shadow-md'
+                        : 'bg-slate-50 border-slate-200 shadow-sm'
+                    }`}
                   >
                     <div>
                       <div className="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
                         <div className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-orange-500">
+                          <span className={`material-symbols-outlined ${isSelected ? 'text-orange-600' : 'text-orange-500'}`}>
                             local_fire_department
                           </span>
                           <h4 className="font-manrope font-bold text-slate-900">
@@ -328,12 +349,17 @@ const ServiceTransfer = ({ user }) => {
                           </h4>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded">
-                            Ocupată
+                          <span className={`px-2 py-1 text-xs font-bold rounded ${
+                            canRefill ? 'bg-sky-100 text-sky-700' : 'bg-orange-100 text-orange-700'
+                          }`}>
+                            {canRefill ? 'Refill Posibil' : 'Ocupată'}
                           </span>
                           {isManager && (
                             <button
-                              onClick={() => openEditModal(slot)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditModal(slot);
+                              }}
                               className="p-1 text-slate-400 hover:text-orange-600 transition-colors"
                               title="Editează supiera"
                             >
@@ -360,7 +386,10 @@ const ServiceTransfer = ({ user }) => {
                     </div>
 
                     <button
-                      onClick={() => handleEmptySlot(slot.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEmptySlot(slot.id);
+                      }}
                       className="w-full py-2 bg-white hover:bg-red-50 text-red-600 border border-slate-200 hover:border-red-200 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm"
                     >
                       <span className="material-symbols-outlined text-[18px]">delete</span>

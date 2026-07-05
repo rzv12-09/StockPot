@@ -8,6 +8,7 @@ import {
   createSupplier,
 } from '../services/invoiceService';
 import { getIngredients } from '../services/ingredientsService';
+import { translateUnit } from '../utils/translations';
 
 const Invoices = () => {
   const [view, setView] = useState('list'); // 'list' or 'create'
@@ -268,7 +269,7 @@ const Invoices = () => {
                                 {expandedInvoiceData.items.map(item => (
                                   <tr key={item.id}>
                                     <td className="py-2 text-slate-800 font-medium">{item.ingredient_name}</td>
-                                    <td className="py-2 text-slate-600 text-right">{item.quantity} <span className="text-xs uppercase ml-0.5">{item.unit_of_measure}</span></td>
+                                    <td className="py-2 text-slate-600 text-right">{item.quantity} <span className="text-xs uppercase ml-0.5">{translateUnit(item.unit_of_measure)}</span></td>
                                     <td className="py-2 text-slate-600 text-right">{item.unit_price} RON</td>
                                     <td className="py-2 font-bold text-orange-700 text-right">{(item.quantity * item.unit_price).toFixed(2)} RON</td>
                                   </tr>
@@ -433,7 +434,7 @@ const Invoices = () => {
                           >
                             <option value="">Selectează...</option>
                             {ingredients.map(ing => (
-                              <option key={ing.id} value={ing.id}>{ing.name} ({ing.unit_of_measure})</option>
+                              <option key={ing.id} value={ing.id}>{ing.name} ({translateUnit(ing.unit_of_measure)})</option>
                             ))}
                           </select>
                         </td>

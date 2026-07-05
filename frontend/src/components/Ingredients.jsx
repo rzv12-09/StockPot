@@ -5,6 +5,7 @@ import {
   deleteIngredient,
   updateIngredient,
 } from '../services/ingredientsService';
+import { translateCategory, translateUnit } from '../utils/translations';
 
 const Ingredients = ({ user }) => {
   const isManager = user?.role === 'MANAGER';
@@ -314,13 +315,13 @@ const Ingredients = ({ user }) => {
                         )}
                       </div>
                       <span className="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        {ingredient.category}
+                        {translateCategory(ingredient.category)}
                       </span>
                     </div>
                   </div>
 
                   <div className="col-span-2 text-sm text-slate-500 font-medium">
-                    {ingredient.unit_of_measure}
+                    {translateUnit(ingredient.unit_of_measure)}
                   </div>
 
                   <div

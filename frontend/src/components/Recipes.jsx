@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getRecipes, addRecipe, deleteRecipe, updateRecipe } from '../services/recipeService';
 import { getIngredients } from '../services/ingredientsService';
+import { translateUnit } from '../utils/translations';
 
 const Recipes = ({ user }) => {
   const isManager = user?.role === 'MANAGER';
@@ -309,7 +310,7 @@ const Recipes = ({ user }) => {
                     <div className="col-span-2 text-right font-semibold text-teal-700">
                       {ing.quantity_required}
                     </div>
-                    <div className="col-span-2 text-sm text-slate-500">{ing.unit_of_measure}</div>
+                    <div className="col-span-2 text-sm text-slate-500">{translateUnit(ing.unit_of_measure)}</div>
                     {isManager && (
                       <div className="col-span-2 text-right">
                         {!selectedRecipe && (
@@ -349,7 +350,7 @@ const Recipes = ({ user }) => {
                       <option value="">-- Selectează Ingredient --</option>
                       {availableIngredients.map((ing) => (
                         <option key={ing.id} value={ing.id}>
-                          {ing.name} ({ing.unit_of_measure})
+                          {ing.name} ({translateUnit(ing.unit_of_measure)})
                         </option>
                       ))}
                     </select>

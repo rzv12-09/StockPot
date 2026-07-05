@@ -22,11 +22,13 @@ const Analytics = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [timeframe, setTimeframe] = useState('weekly');
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const result = await getDashboardData();
+        const result = await getDashboardData(timeframe);
         setData(result);
       } catch (err) {
         setError(err.message);
@@ -35,7 +37,7 @@ const Analytics = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [timeframe]);
 
   if (isLoading) {
     return (
@@ -127,16 +129,48 @@ const Analytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
         {/* Line Chart */}
         <div className="lg:col-span-8 bg-white rounded-xl p-6 shadow-sm border border-slate-200 flex flex-col min-h-[360px]">
-          <div className="mb-6">
-            <h3 className="font-manrope text-lg font-bold text-slate-900">
-              Volum Producție Săptămânală
-            </h3>
-            <p className="text-sm font-body text-slate-500">Litri produși pe zi</p>
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="font-manrope text-lg font-bold text-slate-900">
+                Volum Producție
+              </h3>
+              <p className="text-sm font-body text-slate-500">
+                Litri produși pe {timeframe === 'weekly' ? 'zi (ultimele 7 zile)' : timeframe === 'monthly' ? 'săptămână (ultimele 4 săpt.)' : 'lună (ultimele 12 luni)'}
+              </p>
+            </div>
+            
+            {/* Timeframe Toggle */}
+            <div className="flex bg-slate-100 p-1 rounded-lg">
+              <button
+                onClick={() => setTimeframe('weekly')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                  timeframe === 'weekly' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Săpt.
+              </button>
+              <button
+                onClick={() => setTimeframe('monthly')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                  timeframe === 'monthly' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Lunar
+              </button>
+              <button
+                onClick={() => setTimeframe('yearly')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                  timeframe === 'yearly' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Anual
+              </button>
+            </div>
           </div>
           <div className="flex-1 w-full h-full min-h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={charts.weeklyVolume}
+                data={charts.volumeData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
                 <defs>

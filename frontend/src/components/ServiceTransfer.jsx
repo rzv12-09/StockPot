@@ -179,7 +179,7 @@ const ServiceTransfer = ({ user }) => {
           Transfer Servire
         </h2>
         <p className="font-body text-slate-500 text-sm max-w-2xl">
-          Transferă șarjele preparate din camera frigorifică pe linia de servire activă.
+          Transferă loturile preparate din camera frigorifică pe linia de servire activă.
         </p>
       </div>
 

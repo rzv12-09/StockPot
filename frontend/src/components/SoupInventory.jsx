@@ -237,7 +237,7 @@ const SoupInventory = ({ user }) => {
             <div className="flex flex-col gap-1">
               {filteredStock.length === 0 ? (
                 <div className="py-12 text-center text-slate-500 font-medium">
-                  {searchQuery ? 'Nu am găsit nicio ciorbă cu acest nume.' : 'Camera frigorifică este goală. Mergi la Producție pentru a găti câteva șarje!'}
+                  {searchQuery ? 'Nu am găsit nicio ciorbă cu acest nume.' : 'Camera frigorifică este goală. Mergi la Producție pentru a găti câteva loturi!'}
                 </div>
               ) : (
                 filteredStock.map((item, index) => {

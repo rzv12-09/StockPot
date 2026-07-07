@@ -230,12 +230,12 @@ const Ingredients = ({ user }) => {
               className="w-full bg-white border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20 cursor-pointer shadow-sm"
             >
             <option value="Toate Categoriile">Toate Categoriile</option>
-            <option value="Vegetables">Legume</option>
-            <option value="Meat & Poultry">Carne și Pui</option>
-            <option value="Dairy & Eggs">Lactate și Ouă</option>
-            <option value="Dry Goods">Produse Uscate</option>
-            <option value="Spices & Herbs">Condimente și Ierburi</option>
-            <option value="Liquids">Lichide</option>
+            <option value="Legume">Legume</option>
+            <option value="Carne">Carne</option>
+            <option value="Lactate și Ouă">Lactate și Ouă</option>
+            <option value="Produse Uscate">Produse Uscate</option>
+            <option value="Condimente">Condimente</option>
+            <option value="Lichide">Lichide</option>
             <option value="General">General</option>
           </select>
           </div>
@@ -271,12 +271,12 @@ const Ingredients = ({ user }) => {
                 Number(ingredient.current_stock) <= Number(ingredient.alert_threshold);
 
               const categoryIcons = {
-                'Vegetables': 'eco',
-                'Meat & Poultry': 'kebab_dining',
-                'Dairy & Eggs': 'egg',
-                'Dry Goods': 'inventory_2',
-                'Spices & Herbs': 'spa',
-                'Liquids': 'water_drop',
+                'Legume': 'eco',
+                'Carne': 'kebab_dining',
+                'Lactate și Ouă': 'egg',
+                'Produse Uscate': 'inventory_2',
+                'Condimente': 'spa',
+                'Lichide': 'water_drop',
                 'General': 'grocery'
               };
               
@@ -440,15 +440,13 @@ const Ingredients = ({ user }) => {
                         onChange={handleInputChange}
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pl-4 pr-10 text-slate-900 font-body text-sm appearance-none focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 transition-all cursor-pointer"
                       >
-                        <option disabled value="">
-                          Selectează categoria
-                        </option>
-                        <option value="Vegetables">Legume</option>
-                        <option value="Meat & Poultry">Carne și Pui</option>
-                        <option value="Dairy & Eggs">Lactate și Ouă</option>
-                        <option value="Dry Goods">Produse Uscate</option>
-                        <option value="Spices & Herbs">Condimente și Ierburi</option>
-                        <option value="Liquids">Lichide</option>
+                        <option value="">Selectează categorie...</option>
+                        <option value="Legume">Legume</option>
+                        <option value="Carne">Carne</option>
+                        <option value="Lactate și Ouă">Lactate și Ouă</option>
+                        <option value="Produse Uscate">Produse Uscate</option>
+                        <option value="Condimente">Condimente</option>
+                        <option value="Lichide">Lichide</option>
                         <option value="General">General</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
@@ -477,12 +475,11 @@ const Ingredients = ({ user }) => {
                         <option disabled value="">
                           Selectează unitatea
                         </option>
-                        <option value="kg">kg (Kilograme)</option>
-                        <option value="g">g (Grame)</option>
-                        <option value="L">L (Litri)</option>
-                        <option value="ml">ml (Mililitri)</option>
+                        <option value="kg">Kilograme (kg)</option>
+                        <option value="g">Grame (g)</option>
+                        <option value="L">Litri (L)</option>
+                        <option value="leg.">Legături (leg.)</option>
                         <option value="units">Bucăți / Unitate</option>
-                        <option value="bunch">Legătură</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                         <span className="material-symbols-outlined">expand_more</span>

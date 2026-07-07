@@ -66,7 +66,7 @@ const Production = () => {
         recipe_id: selectedRecipe,
         quantity_produced: quantity,
       });
-      setSuccess(`Șarjă de producție înregistrată! S-au adăugat ${quantity * 50} Litri în inventar.`);
+      setSuccess(`Lot de producție înregistrat! S-au adăugat ${quantity * 50} Litri în inventar.`);
       setQuantity(1); // Resetăm cantitatea
     } catch (err) {
       setError(err.message);
@@ -134,7 +134,7 @@ const Production = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider font-manrope">
-                    Număr Șarje
+                    Număr Loturi
                   </label>
                   <input
                     type="number"

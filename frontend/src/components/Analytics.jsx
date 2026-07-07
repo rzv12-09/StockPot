@@ -271,15 +271,14 @@ const Analytics = () => {
             <h3 className="font-manrope text-sm font-bold text-slate-900 mb-2 uppercase tracking-wider">
               Categorii Inventar
             </h3>
-            <h3>TODO</h3>
-            <div className="flex-1 min-h-[150px] relative flex items-center justify-center">
+            <div className="flex-1 min-h-[150px] relative flex items-center justify-center mt-4">
               {charts.categoryDistribution.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={charts.categoryDistribution}
-                      innerRadius={40}
-                      outerRadius={60}
+                      innerRadius={50}
+                      outerRadius={70}
                       paddingAngle={5}
                       dataKey="value"
                       stroke="none"
@@ -293,6 +292,17 @@ const Analytics = () => {
                         borderRadius: '8px',
                         border: 'none',
                         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="middle"
+                      align="right"
+                      layout="vertical"
+                      iconType="circle"
+                      wrapperStyle={{
+                        fontSize: '12px',
+                        fontFamily: 'Inter, sans-serif',
+                        color: '#475569'
                       }}
                     />
                   </PieChart>
@@ -317,7 +327,7 @@ const Analytics = () => {
               <thead>
                 <tr className="bg-slate-50 text-xs font-manrope font-bold text-slate-500 uppercase tracking-wider">
                   <th className="px-6 py-4">Nume Rețetă</th>
-                  <th className="px-6 py-4">Șarje Gătite</th>
+                  <th className="px-6 py-4">Loturi Gătite</th>
                   <th className="px-6 py-4 text-right">Volum Total</th>
                 </tr>
               </thead>
@@ -332,7 +342,7 @@ const Analytics = () => {
                   charts.topRecipes.map((recipe, index) => (
                     <tr key={index} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4 font-semibold text-slate-900">{recipe.name}</td>
-                      <td className="px-6 py-4 text-slate-500">{recipe.frequency} Șarje</td>
+                      <td className="px-6 py-4 text-slate-500">{recipe.frequency} Loturi</td>
                       <td className="px-6 py-4 text-right font-manrope font-bold text-orange-600">
                         {recipe.total_volume} Litri
                       </td>

@@ -276,7 +276,7 @@ const Recipes = ({ user }) => {
           <div className="xl:col-span-2 bg-white rounded-xl p-8 shadow-sm border border-slate-200 flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-manrope text-xl font-bold text-slate-900">
-                Ingrediente pentru o Șarjă
+                Ingrediente pentru un Lot
               </h3>
               <span className="text-xs font-bold text-orange-700 bg-orange-100 px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm">
                 Producție: 50 L

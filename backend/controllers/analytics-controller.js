@@ -19,7 +19,7 @@ export const getDashboardStats = async (req, res) => {
 
     // 4. Distribuția pe Categorii
     const { rows: categoryDistribution } = await db.query(
-      `SELECT category as name, COUNT(*) as value 
+      `SELECT category as name, COUNT(*)::integer as value 
        FROM Ingredient 
        WHERE category IS NOT NULL 
        GROUP BY category`

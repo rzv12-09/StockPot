@@ -63,6 +63,13 @@ export const executeTransfer = async (req, res) => {
       [recipe_id, slot_id]
     );
 
+    // 5. Înregistrăm transferul pentru statistici
+    await client.query(
+      `INSERT INTO Service_Transfers (recipe_id, slot_id, quantity_transferred)
+       VALUES ($1, $2, 10)`,
+      [recipe_id, slot_id]
+    );
+
     await client.query('COMMIT');
     res.json({ message: 'Transfer successful! 10L placed in the serving slot.' });
   } catch (error) {

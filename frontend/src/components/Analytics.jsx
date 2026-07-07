@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getDashboardData } from '../services/analyticsService';
+import { getDashboardData, getComparisonData } from '../services/analyticsService';
 import {
   AreaChart,
   Area,
@@ -24,6 +24,12 @@ const Analytics = () => {
   const [error, setError] = useState(null);
   const [timeframe, setTimeframe] = useState('weekly');
 
+  // State separat pentru graficul comparativ
+  const [compTimeframe, setCompTimeframe] = useState('weekly');
+  const [compRecipeId, setCompRecipeId] = useState('');
+  const [compData, setCompData] = useState([]);
+  const [compRecipes, setCompRecipes] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -38,6 +44,20 @@ const Analytics = () => {
     };
     fetchData();
   }, [timeframe]);
+
+  // Fetch separat pentru graficul comparativ
+  useEffect(() => {
+    const fetchComparison = async () => {
+      try {
+        const result = await getComparisonData(compTimeframe, compRecipeId || null);
+        setCompData(result.comparisonData);
+        setCompRecipes(result.recipes);
+      } catch (err) {
+        console.error('Comparison fetch error:', err);
+      }
+    };
+    fetchComparison();
+  }, [compTimeframe, compRecipeId]);
 
   if (isLoading) {
     return (
@@ -312,6 +332,93 @@ const Analytics = () => {
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* SECTION 2.5: Producție vs. Vânzări (Transferuri) */}
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 mb-8 flex flex-col">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="font-manrope text-lg font-bold text-slate-900">
+              Producție vs. Vânzări (Transfer Servire)
+            </h3>
+            <p className="text-sm font-body text-slate-500">
+              Comparație între litrii produși și litrii transferați pe {compTimeframe === 'weekly' ? 'zi (ultimele 7 zile)' : compTimeframe === 'monthly' ? 'săptămână (ultimele 4 săpt.)' : 'lună (ultimele 12 luni)'}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Recipe Dropdown */}
+            <select
+              value={compRecipeId}
+              onChange={(e) => setCompRecipeId(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-lg text-sm font-body text-slate-700 py-1.5 px-3 focus:outline-none focus:ring-2 focus:ring-orange-600/20 cursor-pointer"
+            >
+              <option value="">Toate Ciorbele</option>
+              {compRecipes.map((r) => (
+                <option key={r.id} value={r.id}>{r.name}</option>
+              ))}
+            </select>
+            {/* Timeframe Toggle */}
+            <div className="flex bg-slate-100 p-1 rounded-lg">
+              <button
+                onClick={() => setCompTimeframe('weekly')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                  compTimeframe === 'weekly' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Săpt.
+              </button>
+              <button
+                onClick={() => setCompTimeframe('monthly')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                  compTimeframe === 'monthly' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Lunar
+              </button>
+              <button
+                onClick={() => setCompTimeframe('yearly')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                  compTimeframe === 'yearly' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Anual
+              </button>
+            </div>
+          </div>
+        </div>
+        <div style={{ width: '100%', height: 280 }}>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart
+              data={compData}
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: '#64748b' }}
+                dy={10}
+              />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+              <RechartsTooltip
+                contentStyle={{
+                  borderRadius: '8px',
+                  border: 'none',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                }}
+                cursor={{ fill: '#f1f5f9' }}
+              />
+              <Legend 
+                verticalAlign="top" 
+                align="right"
+                wrapperStyle={{ paddingBottom: '20px', fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
+              />
+              <Bar name="Litri Produși" dataKey="volume" fill="#ea580c" radius={[4, 4, 0, 0]} barSize={compTimeframe === 'yearly' ? 24 : 16} />
+              <Bar name="Litri Transferați" dataKey="transferred" fill="#0d9488" radius={[4, 4, 0, 0]} barSize={compTimeframe === 'yearly' ? 24 : 16} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 

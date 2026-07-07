@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getRecipes, addRecipe, deleteRecipe, updateRecipe } from '../services/recipeService';
+import { getRecipes, addRecipe, deleteRecipe, updateRecipe, restoreRecipe, getArchivedRecipes } from '../services/recipeService';
 import { getIngredients } from '../services/ingredientsService';
 import { translateUnit } from '../utils/translations';
 
@@ -15,10 +15,13 @@ const Recipes = ({ user }) => {
   // State pentru a ști ce rețetă edităm
   const [editingRecipeId, setEditingRecipeId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
+  const [archivedRecipes, setArchivedRecipes] = useState([]);
 
   // State pentru formularul de Creare/Editare
   const [recipeName, setRecipeName] = useState('');
   const [recipeDescription, setRecipeDescription] = useState('');
+  const [chefNotes, setChefNotes] = useState('');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [currentIngredientId, setCurrentIngredientId] = useState('');
   const [currentQuantity, setCurrentQuantity] = useState('');
@@ -72,6 +75,7 @@ const Recipes = ({ user }) => {
   const handleEditClick = () => {
     setRecipeName(selectedRecipe.name);
     setRecipeDescription(selectedRecipe.description || '');
+    setChefNotes(selectedRecipe.chef_notes || '');
     setSelectedIngredients(selectedRecipe.ingredients);
     setEditingRecipeId(selectedRecipe.id);
     setSelectedRecipe(null); // Ieșim din modul "Read-Only" și intrăm în Configurator
@@ -87,6 +91,7 @@ const Recipes = ({ user }) => {
       const recipePayload = {
         name: recipeName,
         description: recipeDescription,
+        chef_notes: chefNotes,
         ingredients: selectedIngredients,
       };
 
@@ -99,6 +104,7 @@ const Recipes = ({ user }) => {
       // Resetăm formularul
       setRecipeName('');
       setRecipeDescription('');
+      setChefNotes('');
       setSelectedIngredients([]);
       setEditingRecipeId(null);
       loadData();
@@ -108,13 +114,34 @@ const Recipes = ({ user }) => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Ești sigur că vrei să ștergi această rețetă?')) return;
+    if (!window.confirm('Ești sigur că vrei să arhivezi această rețetă? Ea va fi mutată în secțiunea de rețete arhivate.')) return;
     try {
       await deleteRecipe(id);
       if (selectedRecipe && selectedRecipe.id === id) {
         setSelectedRecipe(null);
       }
       loadData();
+      loadArchivedRecipes();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const loadArchivedRecipes = async () => {
+    try {
+      const data = await getArchivedRecipes();
+      setArchivedRecipes(data);
+    } catch (error) {
+      console.error('Error loading archived recipes:', error);
+    }
+  };
+
+  const handleRestore = async (id) => {
+    if (!window.confirm('Vrei să restaurezi această rețetă?')) return;
+    try {
+      await restoreRecipe(id);
+      loadData();
+      loadArchivedRecipes();
     } catch (error) {
       alert(error.message);
     }
@@ -206,16 +233,60 @@ const Recipes = ({ user }) => {
             <div className="text-center text-sm text-slate-400 mt-8">Nicio rețetă găsită.</div>
           )}
         </div>
+
+        {/* Archived Recipes Toggle */}
+        {isManager && (
+          <div className="mt-2 border-t border-slate-200 pt-3">
+            <button
+              onClick={() => {
+                setShowArchived(!showArchived);
+                if (!showArchived) loadArchivedRecipes();
+              }}
+              className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider hover:text-slate-700 transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px]">archive</span>
+                Arhivate ({archivedRecipes.length})
+              </span>
+              <span className="material-symbols-outlined text-[16px]">
+                {showArchived ? 'expand_less' : 'expand_more'}
+              </span>
+            </button>
+            {showArchived && (
+              <div className="space-y-1 mt-1">
+                {archivedRecipes.length === 0 ? (
+                  <div className="text-center text-xs text-slate-400 py-3">Nicio rețetă arhivată.</div>
+                ) : (
+                  archivedRecipes.map((recipe) => (
+                    <div
+                      key={recipe.id}
+                      className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-100"
+                    >
+                      <span className="text-sm text-slate-500 font-medium line-through">{recipe.name}</span>
+                      <button
+                        onClick={() => handleRestore(recipe.id)}
+                        className="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">restore</span>
+                        Restaurează
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* RIGHT PANEL: Detail / Configuration */}
       <section className="w-full lg:w-2/3 xl:w-3/4 flex flex-col gap-6 h-full overflow-y-auto pb-10 scrollbar-hide pr-2">
         {/* Header Card cu fix pentru overflow */}
-        <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 relative overflow-hidden flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+        <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-slate-200 relative overflow-hidden flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 w-full shrink-0">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
           {/* Wrapper flexibil min-w-0 previne overflow-ul input-urilor lungi */}
-          <div className="flex flex-col gap-2 relative z-10 flex-1 min-w-0">
+          <div className="flex flex-col gap-2 relative z-10 flex-1 min-w-0 w-full max-w-full">
             <div className="flex items-center gap-3 mb-1">
               <span className="text-xs font-bold tracking-wider uppercase text-orange-700 bg-orange-100 px-2.5 py-1 rounded-sm">
                 {selectedRecipe
@@ -227,23 +298,22 @@ const Recipes = ({ user }) => {
             </div>
 
             {selectedRecipe ? (
-              <>
-                <h1 className="font-manrope text-4xl font-extrabold text-slate-900 tracking-tight break-words">
+              <div className="w-full break-words">
+                <h1 className="font-manrope text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight break-words whitespace-normal">
                   {selectedRecipe.name}
                 </h1>
-                <p className="text-slate-600 text-sm mt-1 max-w-xl">
+                <p className="text-slate-600 text-sm mt-1 max-w-xl break-words whitespace-normal">
                   {selectedRecipe.description || 'Nicio descriere adăugată.'}
                 </p>
-              </>
+              </div>
             ) : (
-              <>
-                {/* Truncate pentru a ascunde textul lung ce depășește lățimea */}
+              <div className="w-full max-w-full">
                 <input
                   type="text"
                   value={recipeName}
                   onChange={(e) => setRecipeName(e.target.value)}
                   placeholder="Introdu Numele Rețetei..."
-                  className="font-manrope text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-300 outline-none w-full truncate"
+                  className="font-manrope text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-300 outline-none w-full text-ellipsis overflow-hidden"
                 />
                 {/* Textarea în loc de input pentru a forța textul lung pe mai multe rânduri */}
                 <textarea
@@ -251,23 +321,11 @@ const Recipes = ({ user }) => {
                   value={recipeDescription}
                   onChange={(e) => setRecipeDescription(e.target.value)}
                   placeholder="Adaugă o scurtă descriere..."
-                  className="text-slate-600 text-sm mt-1 max-w-xl bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-400 outline-none w-full resize-none"
+                  className="text-slate-600 text-sm mt-1 w-full bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-400 outline-none resize-none break-words"
                 />
-              </>
+              </div>
             )}
           </div>
-
-          {/* Butonul Edit Recipe este shrink-0 pentru a nu fi redus de flexbox */}
-          {selectedRecipe && isManager && (
-            <div className="flex gap-3 relative z-10 mt-4 sm:mt-0 shrink-0">
-              <button
-                onClick={handleEditClick}
-                className="bg-gradient-to-b from-orange-600 to-orange-700 text-white px-6 py-2 rounded-md font-semibold text-sm shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2 whitespace-nowrap"
-              >
-                <span className="material-symbols-outlined text-[18px]">edit</span> Editează Rețeta
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Main Configuration Area */}
@@ -385,12 +443,12 @@ const Recipes = ({ user }) => {
               <div className="flex-1 min-h-[200px] bg-slate-50 rounded-lg p-4 border border-slate-100">
                 {selectedRecipe ? (
                   <p className="text-sm text-slate-600 whitespace-pre-wrap">
-                    {selectedRecipe.description || 'Fără instrucțiuni speciale.'}
+                    {selectedRecipe.chef_notes || 'Fără instrucțiuni speciale.'}
                   </p>
                 ) : isManager ? (
                   <textarea
-                    value={recipeDescription}
-                    onChange={(e) => setRecipeDescription(e.target.value)}
+                    value={chefNotes}
+                    onChange={(e) => setChefNotes(e.target.value)}
                     className="w-full h-full bg-transparent border-none focus:ring-0 p-0 text-sm text-slate-900 placeholder:text-slate-400 resize-none outline-none leading-relaxed"
                     placeholder="Introdu instrucțiuni de producție sau note pentru garnitură..."
                   />
@@ -416,10 +474,18 @@ const Recipes = ({ user }) => {
                       <>
                         <div className="h-px bg-slate-100 my-2"></div>
                         <button
-                          onClick={() => handleDelete(selectedRecipe.id)}
-                          className="w-full bg-red-50 text-red-600 hover:bg-red-100 py-3 rounded-lg font-bold text-sm transition-colors mt-2"
+                          onClick={handleEditClick}
+                          className="w-full bg-gradient-to-b from-orange-600 to-orange-700 text-white py-3 rounded-lg font-bold text-sm shadow-md hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
                         >
-                          Șterge Rețeta
+                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                          Editează Rețeta
+                        </button>
+                        <button
+                          onClick={() => handleDelete(selectedRecipe.id)}
+                          className="w-full bg-slate-50 text-slate-500 hover:bg-red-50 hover:text-red-600 py-3 rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2 border border-slate-200"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">archive</span>
+                          Arhivează Rețeta
                         </button>
                       </>
                     )}

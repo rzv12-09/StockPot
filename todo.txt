@@ -1,5 +1,3 @@
 INGREDIENTE
 
-sa adaug soft delete pentru retele la ciorbe
-si notitele bucatarului si date mock multe
 search-bar lista ingrediente la creare/editare retete 

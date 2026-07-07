@@ -192,7 +192,7 @@ const Invoices = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
             <h2 className="font-manrope text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-              Invoices (Recepție Marfă)
+              Facturi (Recepție Marfă)
             </h2>
             <p className="font-body text-slate-500 text-sm max-w-2xl">
               Istoric facturi furnizori și achiziții ingrediente.

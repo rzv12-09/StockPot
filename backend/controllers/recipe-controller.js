@@ -1,7 +1,7 @@
 import db from '../db.js';
 
 const addRecipe = async (req, res) => {
-  const { name, description, ingredients } = req.body;
+  const { name, description, chef_notes, ingredients } = req.body;
 
   if (!name || !ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
     return res.status(400).json({
@@ -12,10 +12,10 @@ const addRecipe = async (req, res) => {
   try {
     await db.query('BEGIN');
     const recipeResult = await db.query(
-      `INSERT INTO Recipe (name, description) 
-       VALUES ($1, $2) 
+      `INSERT INTO Recipe (name, description, chef_notes) 
+       VALUES ($1, $2, $3) 
        RETURNING *`,
-      [name, description]
+      [name, description, chef_notes || '']
     );
 
     const newRecipe = recipeResult.rows[0];
@@ -47,6 +47,7 @@ const getRecipes = async (req, res) => {
         r.id, 
         r.name, 
         r.description,
+        r.chef_notes,
         COALESCE(
           json_agg(
             json_build_object(
@@ -60,6 +61,7 @@ const getRecipes = async (req, res) => {
       FROM Recipe r
       LEFT JOIN Recipe_Ingredient ri ON r.id = ri.recipe_id
       LEFT JOIN Ingredient i ON ri.ingredient_id = i.id
+      WHERE r.is_archived = false
       GROUP BY r.id
       ORDER BY r.id ASC;
     `);
@@ -75,25 +77,66 @@ const deleteRecipe = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await db.query(`DELETE FROM Recipe WHERE id = $1 RETURNING *`, [id]);
+    const result = await db.query(
+      `UPDATE Recipe SET is_archived = true WHERE id = $1 AND is_archived = false RETURNING *`,
+      [id]
+    );
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Recipe not found!' });
+      return res.status(404).json({ error: 'Recipe not found or already archived!' });
     }
 
     res.status(200).json({
-      message: 'Recipe deleted successfully!',
-      deletedRecipe: result.rows[0],
+      message: 'Recipe archived successfully!',
+      archivedRecipe: result.rows[0],
     });
   } catch (error) {
-    console.error('Error deleting recipe:', error);
-    res.status(500).json({ error: 'Internal server error while deleting recipe.' });
+    console.error('Error archiving recipe:', error);
+    res.status(500).json({ error: 'Internal server error while archiving recipe.' });
+  }
+};
+
+const restoreRecipe = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query(
+      `UPDATE Recipe SET is_archived = false WHERE id = $1 AND is_archived = true RETURNING *`,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Recipe not found or not archived!' });
+    }
+
+    res.status(200).json({
+      message: 'Recipe restored successfully!',
+      restoredRecipe: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Error restoring recipe:', error);
+    res.status(500).json({ error: 'Internal server error while restoring recipe.' });
+  }
+};
+
+const getArchivedRecipes = async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT id, name, description
+      FROM Recipe
+      WHERE is_archived = true
+      ORDER BY name ASC;
+    `);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching archived recipes:', error);
+    res.status(500).json({ error: 'Internal server error while fetching archived recipes.' });
   }
 };
 
 const updateRecipe = async (req, res) => {
   const { id } = req.params;
-  const { name, description, ingredients } = req.body;
+  const { name, description, chef_notes, ingredients } = req.body;
 
   if (!name || !ingredients || ingredients.length === 0) {
     return res.status(400).json({ error: 'Recipe name and at least one ingredient are required!' });
@@ -104,10 +147,10 @@ const updateRecipe = async (req, res) => {
 
     const recipeResult = await db.query(
       `UPDATE Recipe 
-       SET name = $1, description = $2 
-       WHERE id = $3 
+       SET name = $1, description = $2, chef_notes = $3 
+       WHERE id = $4 
        RETURNING *`,
-      [name, description, id]
+      [name, description, chef_notes || '', id]
     );
 
     if (recipeResult.rowCount === 0) {
@@ -138,4 +181,4 @@ const updateRecipe = async (req, res) => {
   }
 };
 
-export { addRecipe, getRecipes, deleteRecipe, updateRecipe };
+export { addRecipe, getRecipes, deleteRecipe, updateRecipe, restoreRecipe, getArchivedRecipes };

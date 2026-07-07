@@ -39,3 +39,21 @@ export const updateRecipe = async (id, recipeData) => {
   if (!response.ok) throw new Error('Failed to update recipe');
   return await response.json();
 };
+
+export const restoreRecipe = async (id) => {
+  const response = await fetch(`${baseUrl}/api/recipes/${id}/restore`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to restore recipe');
+  return await response.json();
+};
+
+export const getArchivedRecipes = async () => {
+  const response = await fetch(`${baseUrl}/api/recipes/archived`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+  if (!response.ok) throw new Error('Failed to fetch archived recipes');
+  return await response.json();
+};
